@@ -2,7 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- PWA / Mobile Native Standalone Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1b2e24">
+    
     <title>My Readiculous Pocket Library</title>
     <style>
         :root {
@@ -15,142 +22,98 @@
             --accent-red: #d9534f;    
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Georgia', serif; }
-        body { background-color: #2d3748; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; overflow: hidden; }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Georgia', serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body { 
+            background-color: #2d3748; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 0; 
+            overflow: hidden; 
+        }
 
-        /* Splash Screen overlay style */
-        .splash-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #122019;       
-            z-index: 1000;
+        /* Smartphone Container Frame */
+        .smartphone-container {
+            width: 100%;
+            height: 100vh;
+            max-width: 412px;
+            max-height: 892px;
+            background: var(--bg-main);
+            position: relative;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-            pointer-events: all;
+            color: var(--text-light);
         }
-        .splash-overlay.fade-out {
-            opacity: 0;
-            transform: scale(1.08);
-            pointer-events: none;
+
+        @media (min-width: 450px) {
+            .smartphone-container {
+                border-radius: 40px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+                border: 12px solid #0b110e;
+                height: 780px;
+            }
         }
-        .golden-book-container {
-            position: relative;
-            width: 70px;
-            height: 50px;
-            perspective: 150px;
-        }
-        .book-spine {
+
+        /* Elegant Golden Book Opener Splash Screen */
+        #splashScreen {
             position: absolute;
-            left: 50%;
-            bottom: 0;
-            width: 4px;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
-            background: var(--gold-primary);
-            transform: translateX(-50%);
-            border-radius: 1px;
-            z-index: 10;
-        }
-        .book-page-left, .book-page-right, .book-page-flip {
-            position: absolute;
-            bottom: 0;
-            width: 33px;
-            height: 44px;
-            border: 2px solid var(--gold-primary);
             background: var(--bg-main);
-            box-sizing: border-box;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
-        .book-page-left {
-            right: 50%;
-            transform-origin: right center;
-            border-right: none;
-            border-radius: 6px 1px 1px 6px;
-            transform: rotateY(0deg);
-            animation: openPageLeft 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+
+        .splash-book {
+            font-size: 50px;
+            animation: bookFlap 1.2s infinite ease-in-out alternate;
+            transform-origin: center;
         }
-        .book-page-right {
-            left: 50%;
-            transform-origin: left center;
-            border-left: none;
-            border-radius: 1px 6px 6px 1px;
-            transform: rotateY(0deg);
-            animation: openPageRight 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+
+        @keyframes bookFlap {
+            0% { transform: scale(1) rotate(-5deg); }
+            100% { transform: scale(1.15) rotate(5deg); }
         }
-        .book-page-flip {
-            left: 50%;
-            transform-origin: left center;
-            border-left: none;
-            border-radius: 1px 6px 6px 1px;
-            animation: flipPage 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-            z-index: 5;
-        }
-        @keyframes openPageLeft {
-            0% { transform: rotateY(90deg); }
-            100% { transform: rotateY(0deg); }
-        }
-        @keyframes openPageRight {
-            0% { transform: rotateY(-90deg); }
-            100% { transform: rotateY(0deg); }
-        }
-        @keyframes flipPage {
-            0% { transform: rotateY(0deg); opacity: 1; }
-            50% { transform: rotateY(-90deg); opacity: 0.8; }
-            100% { transform: rotateY(-180deg); opacity: 0; }
-        }
+
         .splash-title {
             color: var(--gold-primary);
-            font-family: 'Georgia', serif;
-            font-size: 15px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2.5px;
+            font-size: 16px;
             margin-top: 20px;
-            text-align: center;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            animation: fadeUpText 1s ease-out 0.3s both;
-        }
-        .splash-subtitle {
-            color: var(--text-light);
-            font-family: sans-serif;
-            font-size: 10px;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-top: 6px;
+            font-weight: bold;
             text-align: center;
-            opacity: 0.8;
-            animation: fadeUpText 1s ease-out 0.5s both;
-        }
-        @keyframes fadeUpText {
-            0% { opacity: 0; transform: translateY(10px); }
-            100% { opacity: 1; transform: translateY(0); }
+            padding: 0 20px;
         }
 
-        .flying-book {
-            position: absolute;
-            z-index: 150;
-            font-size: 32px;
-            pointer-events: none;
-            transition: left 0.9s cubic-bezier(0.25, 1, 0.5, 1), 
-                        top 0.9s cubic-bezier(0.25, 1, 0.5, 1), 
-                        transform 0.9s ease-out, 
-                        opacity 0.9s ease-out;
-            opacity: 1;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+        .splash-subtitle {
+            color: var(--text-muted);
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 6px;
         }
 
-        .smartphone-container {
-            width: 375px; height: 760px; background: var(--bg-main); border-radius: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 12px solid #0b110e;
-            position: relative; overflow: hidden; display: flex; flex-direction: column; color: var(--text-light);
-        }
-
-        header { padding: 24px 20px 12px 20px; }
+        header { padding: 20px 20px 10px 20px; }
         .brand-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        h1 { font-size: 20px; font-weight: 400; color: var(--gold-primary); letter-spacing: 2px; text-transform: uppercase; }
+        h1 { font-size: 18px; font-weight: 400; color: var(--gold-primary); letter-spacing: 1.5px; text-transform: uppercase; }
 
-        /* Canvas for celebratory confetti and scan simulation overlay */
+        /* Celebrative Canvas and Scanning Overlay */
         #confettiCanvas {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 99; display: none;
@@ -167,16 +130,41 @@
             100% { top: 20%; }
         }
 
-        /* WIDGETS & STATS */
-        .challenge-widget { background: var(--bg-card); padding: 12px; border-radius: 6px; border-left: 2px solid var(--gold-primary); margin-bottom: 12px; }
-        .challenge-info { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .progress-bar-bg { width: 100%; height: 2px; background: #233d30; border-radius: 1px; overflow: hidden; margin-top: 6px; }
+        /* WIDGETS & CHALLENGE SYSTEM */
+        .challenge-widget { 
+            background: var(--bg-card); 
+            padding: 12px; 
+            border-radius: 6px; 
+            border-left: 2px solid var(--gold-primary); 
+            margin-bottom: 12px; 
+        }
+        .challenge-info { 
+            display: flex; 
+            flex-direction: column; 
+            font-size: 10px; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+            gap: 2px;
+        }
+        .challenge-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .challenge-dates-row {
+            font-size: 8px;
+            color: var(--gold-muted);
+            margin-top: 2px;
+        }
+        .progress-bar-bg { width: 100%; height: 4px; background: #233d30; border-radius: 2px; overflow: hidden; margin-top: 6px; }
         .progress-bar-fill { width: 0%; height: 100%; background: var(--gold-primary); transition: width 0.5s ease; }
+        .challenge-motivation-text { font-size: 9px; color: var(--gold-primary); font-style: italic; margin-top: 4px; display: block; }
 
         .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-        .stat-box { background: var(--bg-card); border: 1px solid #1c3227; border-radius: 4px; padding: 8px; text-align: center; position: relative; }
-        .stat-value { font-size: 13px; font-weight: bold; color: var(--gold-primary); font-family: sans-serif; }
-        .stat-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; letter-spacing: 0.5px; }
+        .stat-box { background: var(--bg-card); border: 1px solid #1c3227; border-radius: 4px; padding: 6px; text-align: center; }
+        .stat-value { font-size: 11px; font-weight: bold; color: var(--gold-primary); font-family: sans-serif; }
+        .stat-label { font-size: 8px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; letter-spacing: 0.5px; }
 
         /* CONTROLS & SUB-FILTERS */
         .search-sort-container { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; }
@@ -184,19 +172,18 @@
         .search-box input { background: transparent; border: none; color: var(--text-light); font-size: 12px; width: 100%; outline: none; }
         .search-box input::placeholder { color: var(--text-muted); font-style: italic; }
         
-        /* Dropdown custom sorting select styling */
         .sort-dropdown {
             background: var(--bg-card); border: 1px solid #233d30; border-radius: 6px;
             color: var(--text-light); font-size: 11px; padding: 6px; outline: none;
-            font-family: sans-serif; cursor: pointer; max-width: 120px;
+            font-family: sans-serif; cursor: pointer; max-width: 110px;
         }
 
-        .filters { display: flex; gap: 12px; border-bottom: 1px solid #233d30; padding-bottom: 6px; flex-wrap: wrap; align-items: center; }
+        .filters { display: flex; gap: 10px; border-bottom: 1px solid #233d30; padding-bottom: 6px; flex-wrap: wrap; align-items: center; }
         .filter-btn { background: transparent; border: none; font-size: 11px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; padding-bottom: 2px; }
         .filter-btn.active { color: var(--gold-primary); border-bottom: 2px solid var(--gold-primary); }
 
         /* VIEWS */
-        .view-section { display: none; flex: 1; overflow-y: auto; padding: 0 20px 90px 20px; }
+        .view-section { display: none; flex: 1; overflow-y: auto; padding: 0 20px 80px 20px; }
         .view-section.active { display: block; }
         .books-grid, .agenda-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
         
@@ -212,148 +199,81 @@
         .book-author { font-size: 11px; color: var(--gold-muted); }
         .tag { font-size: 8px; padding: 1px 5px; border-radius: 3px; background: #1c3227; color: var(--gold-primary); text-transform: uppercase; border: 1px solid #284437; display: inline-block; width: fit-content; font-family: sans-serif; }
         
-        /* AGENDA DIFFERENTIATED STYLING */
-        .agenda-card.urgent-reminder {
-            border-left: 4px solid var(--accent-red);
-            background: linear-gradient(90deg, rgba(217, 83, 79, 0.08) 0%, var(--bg-card) 100%);
-        }
-        .agenda-card.normal-reminder {
-            border-left: 4px solid var(--gold-primary);
-            background: linear-gradient(90deg, rgba(202, 163, 91, 0.08) 0%, var(--bg-card) 100%);
-        }
-
-        /* Pulsing Glow Animation for Urgent events approaching (within 1 day) */
-        .agenda-card.urgent-approaching {
-            border-left: 4px solid var(--accent-red);
-            animation: urgentAlertPulse 2s infinite alternate;
-        }
-
-        @keyframes urgentAlertPulse {
-            0% {
-                box-shadow: 0 0 4px rgba(217, 83, 79, 0.2);
-                border-color: rgba(217, 83, 79, 0.6);
-                background: linear-gradient(90deg, rgba(217, 83, 79, 0.1) 0%, var(--bg-card) 100%);
-            }
-            100% {
-                box-shadow: 0 0 14px rgba(217, 83, 79, 0.7);
-                border-color: rgba(217, 83, 79, 1);
-                background: linear-gradient(90deg, rgba(217, 83, 79, 0.18) 0%, #1e1d1a 100%);
-            }
-        }
-
-        .export-ics-btn {
-            background: transparent;
-            border: 1px dashed var(--gold-muted);
-            color: var(--gold-primary);
-            font-size: 9px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: fit-content;
-            text-transform: uppercase;
-            font-family: sans-serif;
-            margin-top: 4px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.2s;
-        }
-        .export-ics-btn:hover {
-            background: var(--gold-primary);
-            color: var(--bg-main);
-            border-style: solid;
-        }
-
-        /* NEWS REVENUE STYLING */
-        .news-card { align-items: flex-start; text-decoration: none; padding-right: 55px; }
+        /* News Feed layouts */
+        .news-card { align-items: flex-start; padding-right: 55px; }
         .news-source { font-size: 9px; color: var(--gold-primary); text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        /* FLASH DOT COMPONENT */
         .flash-dot { width: 6px; height: 6px; background-color: var(--accent-red); border-radius: 50%; display: inline-block; margin-left: 6px; vertical-align: middle; box-shadow: 0 0 8px var(--accent-red); animation: pulseDot 1.5s infinite; }
         @keyframes pulseDot { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.5; } }
 
-        /* ACTIONS CONTROLS */
+        /* ACTION SYSTEM CONTROLS */
         .actions-wrapper { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; }
         .action-icon-btn { background: transparent; border: none; cursor: pointer; font-size: 11px; filter: opacity(0.5); transition: filter 0.2s; }
         .action-icon-btn:hover { filter: opacity(1); }
 
-        /* Posh Checklist */
         .posh-checkbox { width: 16px; height: 16px; border: 1px solid var(--gold-muted); border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: transparent; font-size: 10px; transition: all 0.2s; background: transparent; }
         .posh-checkbox.checked { background: var(--gold-primary); color: var(--bg-main); border-color: var(--gold-primary); }
 
+        /* BOOK FLIGHT ANIMATION WRAPPER */
+        .flying-book-asset {
+            position: absolute;
+            font-size: 28px;
+            z-index: 1000;
+            pointer-events: none;
+            transition: transform 0.8s cubic-bezier(0.075, 0.82, 0.165, 1);
+            transform-origin: center;
+        }
+
         /* INSPIRATION SECTIONS */
-        .section-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin: 20px 0 8px 0; letter-spacing: 1.5px; border-bottom: 1px solid #1c3227; padding-bottom: 4px; }
+        .section-title-row { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 8px 0; border-bottom: 1px solid #1c3227; padding-bottom: 4px; }
+        .section-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1.5px; }
+        .clear-all-btn { background: transparent; border: none; font-size: 9px; color: var(--accent-red); cursor: pointer; text-transform: uppercase; }
+        
         .moods-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .mood-btn { background: var(--bg-card); border: 1px solid #233d30; border-radius: 8px; padding: 14px; color: var(--text-light); text-align: left; font-size: 12px; line-height: 1.4; position: relative; padding-right: 25px; min-height: 75px; }
+        .mood-btn { background: var(--bg-card); border: 1px solid #233d30; border-radius: 8px; padding: 12px; color: var(--text-light); text-align: left; font-size: 12px; line-height: 1.4; position: relative; padding-right: 25px; min-height: 75px; display: flex; flex-direction: column; justify-content: space-between; }
         
         .photo-mood-zone { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
-        .mood-photo { width: 100%; height: 90px; background: #122019; border-radius: 4px; border: 1px solid #1c3227; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--gold-muted); overflow: hidden; position: relative; }
+        .mood-photo { width: 100%; height: 95px; background: #122019; border-radius: 4px; border: 1px solid #1c3227; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--gold-muted); overflow: hidden; position: relative; }
         .mood-photo img { width: 100%; height: 100%; object-fit: cover; }
-
-        .photo-action-pill {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            background: rgba(18, 32, 25, 0.85);
-            border: 1px solid var(--gold-primary);
-            border-radius: 20px;
-            padding: 4px 8px;
-            display: flex;
-            gap: 8px;
-            backdrop-filter: blur(4px);
-            z-index: 10;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .photo-action-btn {
-            background: none;
-            border: none;
-            color: var(--gold-primary);
-            cursor: pointer;
-            font-size: 11px;
-            padding: 2px;
-            transition: transform 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .photo-action-btn:hover {
-            transform: scale(1.2);
-        }
-        .clear-all-btn {
-            background: transparent;
-            border: 1px dashed var(--accent-red);
-            color: var(--accent-red);
-            font-size: 9px;
-            padding: 3px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-family: sans-serif;
-            transition: all 0.2s;
-        }
-        .clear-all-btn:hover {
-            background: var(--accent-red);
-            color: white;
-        }
+        .photo-actions-pill { position: absolute; bottom: 4px; right: 4px; background: rgba(18, 32, 25, 0.85); border-radius: 4px; padding: 2px 4px; display: flex; gap: 4px; }
+        .photo-pill-btn { background: transparent; border: none; font-size: 9px; cursor: pointer; color: var(--gold-primary); }
 
         .quotes-list { display: flex; flex-direction: column; gap: 8px; }
         .challenge-box-complete { border: 1px solid var(--gold-primary); background: linear-gradient(145deg, #122019, #1e3529); animation: goldenGlow 3s infinite alternate; }
         @keyframes goldenGlow { 0% { box-shadow: 0 0 4px rgba(202, 163, 91, 0.1); } 100% { box-shadow: 0 0 12px rgba(202, 163, 91, 0.5); } }
 
-        /* ACTION BUTTONS */
+        /* AGENDA URGENT / NORMAL CARDS */
+        .agenda-card.urgent-alert {
+            border: 1px solid var(--accent-red);
+            background: linear-gradient(145deg, #1a1010, #2a1212);
+            animation: urgentPulse 2.5s infinite alternate;
+        }
+        @keyframes urgentPulse {
+            0% { box-shadow: 0 0 2px rgba(217, 83, 79, 0.1); }
+            100% { box-shadow: 0 0 10px rgba(217, 83, 79, 0.4); }
+        }
+
         .section-action-btn { width: 100%; background: transparent; border: 1px dashed var(--gold-muted); color: var(--gold-primary); padding: 10px; border-radius: 6px; cursor: pointer; font-size: 11px; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* NAVIGATION BAR */
-        nav.bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 65px; background: var(--bg-card); border-top: 1px solid #1c3227; display: flex; justify-content: space-around; align-items: center; padding-bottom: 10px; }
+        nav.bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 65px; background: var(--bg-card); border-top: 1px solid #1c3227; display: flex; justify-content: space-around; align-items: center; padding-bottom: 12px; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); background: none; border: none; font-size: 18px; cursor: pointer; width: 25%; height: 100%; justify-content: center; filter: grayscale(1) opacity(0.6); }
         .nav-item.active { filter: grayscale(0) opacity(1); font-size: 21px; }
 
+        /* TOAST SUCCESS BANNER */
+        .success-toast {
+            position: absolute; top: 12px; left: 12px; right: 12px;
+            background: #233d30; border: 1px solid var(--gold-primary);
+            padding: 10px; border-radius: 8px; display: none; align-items: center; gap: 8px;
+            z-index: 100; font-size: 11px; font-family: sans-serif;
+            animation: slideDown 0.4s ease forwards;
+        }
+        @keyframes slideDown { 0% { transform: translateY(-40px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+
         /* MODALS */
-        .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); display: none; justify-content: flex-end; flex-direction: column; z-index: 10; }
+        .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); display: none; justify-content: flex-end; flex-direction: column; z-index: 1000; }
         .passport-form { background: var(--bg-main); border-top: 1px solid var(--gold-primary); border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 22px; max-height: 90%; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
         .passport-form h2 { font-size: 14px; color: var(--gold-primary); font-weight: 400; text-transform: uppercase; letter-spacing: 1.5px; }
         
-        /* Auto Scan and ISBN Metadata Row styles */
         .isbn-actions-row { display: flex; gap: 8px; margin-top: -4px; }
         .btn-scanner-action { flex: 1; font-size: 10px; padding: 6px; background: #233d30; border: 1px solid var(--gold-muted); color: var(--gold-primary); border-radius: 4px; cursor: pointer; text-transform: uppercase; font-family: sans-serif; display: flex; align-items: center; justify-content: center; gap: 4px; }
         .btn-scanner-action:hover { background: var(--bg-card); }
@@ -379,7 +299,6 @@
         .pref-toggle-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-top: 8px; color: var(--text-light); }
         .pref-toggle-row input { cursor: pointer; accent-color: var(--gold-primary); }
 
-        /* Heart Animation Pulse */
         .heart-btn { background: none; border: none; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; outline: none; transition: transform 0.2s; }
         .heart-btn.pulse { animation: heartBeat 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes heartBeat {
@@ -388,35 +307,36 @@
             65% { transform: scale(0.85); }
             100% { transform: scale(1); }
         }
+
+        /* COMPACT SHARE MODAL OVERLAY */
+        .share-sheet-overlay { display:none; position:absolute; bottom:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1100; flex-direction:column; justify-content:flex-end; }
+        .share-sheet { background:var(--bg-main); border-top:2px solid var(--gold-primary); border-top-left-radius:24px; border-top-right-radius:24px; padding:20px; text-align:center; }
+        .share-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin:20px 0; }
+        .share-item { display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; }
+        .share-circle { width:45px; height:45px; border-radius:50%; background:#1c3227; display:flex; align-items:center; justify-content:center; font-size:18px; border:1px solid var(--gold-primary); }
     </style>
 </head>
 <body>
+
+    <!-- FAIL-SAFE SPLASH OVERLAY: Guaranteed removal regardless of network/JS success -->
+    <div id="splashScreen">
+        <div class="splash-book">📖</div>
+        <div class="splash-title">My Readiculous</div>
+        <div class="splash-subtitle">Pocket Library</div>
+    </div>
+
     <div class="smartphone-container">
-
-        <!-- Elegant 1.5s Golden Book Opening Splash Screen -->
-        <div id="splashScreen" class="splash-overlay">
-            <div class="golden-book-container">
-                <div class="book-spine"></div>
-                <div class="book-page-left"></div>
-                <div class="book-page-right"></div>
-                <div class="book-page-flip"></div>
-            </div>
-            <div class="splash-title">My Readiculous</div>
-            <div class="splash-subtitle">Pocket Library</div>
-        </div>
-
-        <!-- Confetti Canvas overlay for reading milestone celebrations -->
+        <!-- Confetti Canvas -->
         <canvas id="confettiCanvas"></canvas>
 
-        <!-- Elegant Congratulations Toast Overlay inside the mobile container -->
-        <div id="congratsToast" style="display:none; position:absolute; top:80px; left:20px; right:20px; background:linear-gradient(135deg, var(--bg-card) 0%, #1e3529 100%); border:1px solid var(--gold-primary); border-radius:12px; padding:16px; z-index:120; box-shadow:0 10px 25px rgba(0,0,0,0.5); text-align:center; transform:translateY(-20px); opacity:0; transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-            <div style="font-size:24px; margin-bottom:4px;">🏆</div>
-            <h4 style="color:var(--gold-primary); font-family:'Georgia', serif; font-size:14px; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Congratulations!</h4>
-            <p id="congratsToastMessage" style="font-size:11px; color:var(--text-light); line-height:1.4; font-family:sans-serif;">You completed the challenge!</p>
+        <!-- Toast Notifications -->
+        <div class="success-toast" id="appToast">
+            <span id="appToastIcon">🌟</span>
+            <span id="appToastMsg">Success</span>
         </div>
 
-        <!-- Simulated camera active scanning barcode interface overlay -->
-        <div id="scannerOverlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:100; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:sans-serif; text-align:center;">
+        <!-- Simulated Camera Overlay -->
+        <div id="scannerOverlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:9000; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:sans-serif; text-align:center;">
             <div style="position:relative; width:260px; height:260px; border:2px dashed var(--gold-primary); border-radius:24px; overflow:hidden; display:flex; align-items:center; justify-content:center; background: radial-gradient(circle, rgba(16,36,25,0.7) 0%, rgba(5,12,8,0.9) 100%);">
                 <div class="scanner-laser"></div>
                 <div style="font-size:32px;">📷</div>
@@ -430,37 +350,32 @@
         </div>
 
         <header>
-            <div class="brand-area">
-                <h1 id="viewTitle">My Library</h1>
-            </div>
+            <div class="brand-area"><h1 id="viewTitle">My Library</h1></div>
 
+            <!-- Dynamic Live Stats -->
             <div class="stats-container" id="statsPanel">
-                <div class="stat-box">
-                    <div class="stat-value" id="stat-read">1</div>
-                    <div class="stat-label" id="lbl-read">Read</div>
-                </div>
-                <!-- Replaced Streak with dynamic Format Breakdown percentages -->
-                <div class="stat-box">
-                    <div class="stat-value" id="stat-formats" style="font-size: 11px; padding-top: 2px;">100% / 0% / 0%</div>
-                    <div class="stat-label" id="lbl-formats">Phys / Eb / Au</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" id="stat-fav">1</div>
-                    <div class="stat-label" id="lbl-fav">Favorites</div>
-                </div>
+                <div class="stat-box"><div class="stat-value" id="stat-read">0</div><div class="stat-label">Read</div></div>
+                <div class="stat-box"><div class="stat-value" id="stat-breakdown">0%</div><div class="stat-label">Physical/Digital</div></div>
+                <div class="stat-box"><div class="stat-value" id="stat-fav">0</div><div class="stat-label">Favorites</div></div>
             </div>
 
+            <!-- Active Challenge Tracking Header Widget -->
             <div id="challengeWidget" class="challenge-widget">
                 <div class="challenge-info">
-                    <span id="lbl-challenge">Challenge Progress</span>
-                    <span id="challenge-encouragement" style="color:var(--gold-primary); font-weight:bold; font-size:10px;">Let's start! 📖</span>
-                    <strong id="challenge-count">1 / 1</strong>
+                    <div class="challenge-header-row">
+                        <span id="challenge-header-title">No Active Challenge Selected</span>
+                        <strong id="challenge-count">0% Completed</strong>
+                    </div>
+                    <div class="challenge-dates-row" id="challenge-header-dates">
+                        Set active targets in the Inspo Zone
+                    </div>
                 </div>
                 <div class="progress-bar-bg"><div class="progress-bar-fill" id="challenge-bar" style="width: 0%"></div></div>
+                <span class="challenge-motivation-text" id="challengeMotivation">Let's get reading! 📖</span>
             </div>
 
             <div class="search-sort-container" id="searchContainer">
-                <div class="search-box"><input type="text" id="searchInput" placeholder="Search..." oninput="renderAll()"></div>
+                <div class="search-box"><input type="text" id="searchInput" placeholder="Search library database..." oninput="renderAll()"></div>
                 <select id="sortSelect" class="sort-dropdown" onchange="renderAll()">
                     <option value="title-asc">Title (A-Z)</option>
                     <option value="author-asc">Author (A-Z)</option>
@@ -473,35 +388,45 @@
             <div class="filters" id="contentFilters"></div>
         </header>
 
+        <!-- LIBRARY VIEW -->
         <main class="view-section active" id="librarySection">
             <button class="section-action-btn" onclick="openModal('library')">✦ Add Book Entry</button>
             <div class="books-grid" id="libraryGrid"></div>
         </main>
 
+        <!-- WISHLIST VIEW -->
         <main class="view-section" id="wishlistSection">
             <button class="section-action-btn" onclick="openModal('wishlist')">✦ Add to Wishlist</button>
             <div class="books-grid" id="wishlistGrid"></div>
         </main>
 
+        <!-- INSPIRATION ZONE VIEW -->
         <main class="view-section" id="inspirationSection">
             <button class="section-action-btn" onclick="openModal('inspiration')">✦ Add New Snippet</button>
             
-            <div class="section-title">Quotes</div>
+            <div class="section-title-row">
+                <div class="section-title">Quotes</div>
+            </div>
             <div class="quotes-list" id="quotesZone"></div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 8px 0; border-bottom: 1px solid #1c3227; padding-bottom: 4px;">
-                <span style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1.5px;">Photos & Pics</span>
+            <div class="section-title-row">
+                <div class="section-title">Photos & Pics</div>
                 <button class="clear-all-btn" onclick="clearAllPhotos()">🗑️ Clear All</button>
             </div>
             <div class="photo-mood-zone" id="photoZone"></div>
 
-            <div class="section-title">Challenges</div>
+            <div class="section-title-row">
+                <div class="section-title">Challenges & Goals</div>
+            </div>
             <div class="moods-grid" id="challengeZone"></div>
 
-            <div class="section-title">Lists</div>
+            <div class="section-title-row">
+                <div class="section-title">Custom Lists & Moods</div>
+            </div>
             <div class="moods-grid" id="listsZone"></div>
         </main>
 
+        <!-- READING HUB VIEW -->
         <main class="view-section" id="agendaSection">
             <div id="agendaEventControls">
                 <button class="section-action-btn" id="toggleMapBtn" style="background:#1c3227; font-weight:bold; border-style: solid; margin-bottom: 6px;" onclick="toggleMapSection()">📍 Open Book Locations Map</button>
@@ -517,7 +442,7 @@
                         <div class="radar-circle" style="width:60px; height:60px;"></div>
                         <div class="radar-circle" style="width:110px; height:110px;"></div>
                     </div>
-                    <div style="font-size:9px; color:var(--text-muted); text-align:center; margin-top:4px;">Pins showing local independent spots, libraries & discoveries.</div>
+                    <div style="font-size:9px; color:var(--text-muted); text-align:center; margin-top:4px;">Pins showing secret bookshops, spots & libraries.</div>
                 </div>
 
                 <button class="section-action-btn" id="addEventBtn" onclick="openModal('agenda')">✦ Add Calendar Event</button>
@@ -527,23 +452,19 @@
                 <div class="feed-preferences-box">
                     <div style="font-size:10px; text-transform:uppercase; color:var(--gold-primary); letter-spacing:1px; margin-bottom:4px; display:flex; justify-content:space-between;">
                         <span>⚙️ Feed Preferences</span>
-                        <span style="color:var(--text-muted); font-size:9px; font-style:italic;">Anti-Doomscrolling Enabled</span>
+                        <span style="color:var(--text-muted); font-size:9px; font-style:italic;">Anti-Spam Filter (Max 3/source)</span>
                     </div>
                     <div class="pref-toggle-row">
                         <span>Include New York Times Books</span>
                         <input type="checkbox" id="prefNYT" checked onchange="toggleSourcePreference()">
                     </div>
                     <div class="pref-toggle-row">
-                        <span>Include Guardian Books</span>
-                        <input type="checkbox" id="prefGuardian" checked onchange="toggleSourcePreference()">
-                    </div>
-                    <div class="pref-toggle-row">
-                        <span>Include Regional/Local News Hub</span>
+                        <span>Include Regional / Local News Hub</span>
                         <input type="checkbox" id="prefLocal" checked onchange="toggleSourcePreference()">
                     </div>
                     <div class="pref-toggle-row">
-                        <span>Include Goodreads Literary Feed</span>
-                        <input type="checkbox" id="prefGoodreads" checked onchange="toggleSourcePreference()">
+                        <span>Include Goodreads Blog RSS</span>
+                        <input type="checkbox" id="prefIndie" checked onchange="toggleSourcePreference()">
                     </div>
                 </div>
             </div>
@@ -551,6 +472,7 @@
             <div class="agenda-grid" id="agendaGrid"></div>
         </main>
 
+        <!-- NAVIGATION BAR -->
         <nav class="bottom-nav">
             <button class="nav-item active" id="navLib" onclick="switchView('library')">📖</button>
             <button class="nav-item" id="navWish" onclick="switchView('wishlist')">☑</button>
@@ -558,34 +480,13 @@
             <button class="nav-item" id="navAgenda" onclick="switchView('agenda')">📅</button>
         </nav>
 
-        <!-- MODALS -->
+        <!-- MODAL WINDOW OVERLAYS -->
         <div class="modal-overlay" id="ctxModal">
-            <!-- SHARE WISHLIST MODAL -->
-            <div class="passport-form" id="f-share" style="display:none;">
-                <h2 id="shareModalTitle">Share Book</h2>
-                <div class="form-group">
-                    <label>Personalized Message</label>
-                    <textarea id="shareText" rows="4" readonly style="font-family: sans-serif; resize: none; background: #122019; border: 1px solid #233d30; color: var(--text-light); padding: 8px; border-radius: 4px;"></textarea>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-                    <a id="shareWhatsappBtn" target="_blank" class="btn-save" style="background:#25D366; color:white; text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px; font-family: sans-serif;">
-                        💬 Share on WhatsApp
-                    </a>
-                    <a id="shareEmailBtn" target="_blank" class="btn-save" style="background:#EA4335; color:white; text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px; font-family: sans-serif;">
-                        ✉️ Send by Email
-                    </a>
-                    <button onclick="copyShareText()" class="btn-save" style="background:var(--gold-primary); color:var(--bg-main); font-weight:bold; cursor:pointer;">
-                        📋 Copy to Clipboard
-                    </button>
-                </div>
-                <div class="btn-cancel" onclick="closeModal()" style="margin-top: 8px;">Close</div>
-            </div>
-
-            <!-- LIBRARY MODAL -->
+            <!-- LIBRARY PORTFOLIO FORM -->
             <div class="passport-form" id="f-library" style="display:none;">
                 <h2 id="libModalTitle">Add Book Entry</h2>
                 <input type="hidden" id="editLibIdx">
-                <div class="duplicate-warning" id="libDupNotice">Note: This title already exists in your library.</div>
+                <div class="duplicate-warning" id="libDupNotice">Note: This book is already in your database.</div>
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -599,7 +500,7 @@
                 <div class="isbn-actions-row">
                     <button class="btn-scanner-action" onclick="startScanner()">📷 Scan with Camera</button>
                 </div>
-                <div id="isbnIndicator" class="fetch-indicator">Loading book metadata from OpenLibrary...</div>
+                <div id="isbnIndicator" class="fetch-indicator">Connecting to OpenLibrary...</div>
 
                 <div class="form-row">
                     <div class="form-group"><label>Title *</label><input type="text" id="libTitle" oninput="checkLibDup(this.value)"></div>
@@ -624,79 +525,71 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label>Rating (0-5)</label><input type="number" id="libRating" min="0" max="5" value="5"></div>
-                    <div class="form-group"><label>Location</label><input type="text" id="libLoc" placeholder="e.g. Living Room Shelf"></div>
+                    <div class="form-group"><label>Physical Location</label><input type="text" id="libLoc" placeholder="e.g. Living Room Shelf"></div>
                 </div>
-                <div class="form-group"><label>Personal Notes</label><textarea id="libNotes" rows="2"></textarea></div>
-                <div class="form-group" style="flex-direction:row; gap:10px;"><input type="checkbox" id="libFav" checked> <label>Mark as Favorite</label></div>
+                <div class="form-group"><label>Personal Review & Notes</label><textarea id="libNotes" rows="2"></textarea></div>
+                <div class="form-group" style="flex-direction:row; gap:10px;"><input type="checkbox" id="libFav"> <label>Mark as Favorite</label></div>
                 <button class="btn-save" onclick="saveLibrary()">Save Entry</button>
                 <div class="btn-cancel" onclick="closeModal()">Cancel</div>
             </div>
 
-            <!-- WISHLIST MODAL -->
+            <!-- WISHLIST FORM -->
             <div class="passport-form" id="f-wishlist" style="display:none;">
                 <h2 id="wishModalTitle">Add To Wishlist</h2>
                 <input type="hidden" id="editWishIdx">
                 <div class="form-group"><label>Title *</label><input type="text" id="wishTitle"></div>
                 <div class="form-group"><label>Author *</label><input type="text" id="wishAuthor"></div>
                 <div class="form-row">
-                    <div class="form-group"><label>ISBN</label><input type="text" id="wishIsbn"></div>
+                    <div class="form-group"><label>ISBN (Optional)</label><input type="text" id="wishIsbn"></div>
                     <div class="form-group"><label>Where to Find / Retailer</label><input type="text" id="wishWhere" placeholder="e.g. Bertrand Chiado"></div>
                 </div>
                 <button class="btn-save" onclick="saveWishlist()">Save to Wishlist</button>
                 <div class="btn-cancel" onclick="closeModal()">Cancel</div>
             </div>
 
-            <!-- INSPIRATION MODAL -->
+            <!-- INSPIRATION ZONE FORM -->
             <div class="passport-form" id="f-inspiration" style="display:none;">
                 <h2 id="inspModalTitle">Add New Snippet</h2>
                 <input type="hidden" id="editInspIdx">
-                <div class="form-group" id="inspTypeRow"><label>Destination Section</label>
+                <div class="form-group" id="inspTypeRow"><label>Snippet Type</label>
                     <select id="inspType" onchange="toggleInspirationFormFields(this.value)">
                         <option value="quote">Quote</option>
-                        <option value="photo">Photo / Pic (URL/Upload)</option>
-                        <option value="challenge">Challenge</option>
-                        <option value="list">Custom List / Mood</option>
+                        <option value="photo">Photo / Picture</option>
+                        <option value="challenge">Challenge / Goal</option>
+                        <option value="list">Custom Checklist / Mood</option>
                     </select>
                 </div>
                 
-                <div class="form-group" id="photoUploadRow" style="display:none;">
-                    <label>Choose Photo Source</label>
-                    <div style="display:flex; gap:8px; margin-bottom:8px;">
-                        <button type="button" class="btn-scanner-action" id="btnSourceUpload" onclick="setPhotoSource('upload')" style="background:var(--gold-primary); color:var(--bg-main);">Device Gallery</button>
-                        <button type="button" class="btn-scanner-action" id="btnSourceUrl" onclick="setPhotoSource('url')">Web URL</button>
-                    </div>
-                    <div id="photoUploadInputGroup">
-                        <input type="file" id="inspFile" accept="image/*" style="display:block; background:var(--bg-card); color:var(--text-light); border:1px solid #233d30; padding:6px; border-radius:4px; width:100%; font-size:11px;">
-                    </div>
-                    <div id="photoUrlInputGroup" style="display:none;">
-                        <input type="text" id="inspPhotoUrl" placeholder="https://..." style="background:var(--bg-card); border:1px solid #233d30; border-radius:4px; padding:8px; color:var(--text-light); width:100%; font-size:12px;">
-                    </div>
+                <!-- Fields for Quote / Challenge / Custom list -->
+                <div class="form-group" id="inspContentGroup"><label>Content / Checklist Items</label><textarea id="inspContent" rows="4" placeholder="Enter text context..."></textarea></div>
+                
+                <!-- Advanced Challenge Fields -->
+                <div class="form-row" id="challengeDatesRowForm" style="display:none;">
+                    <div class="form-group"><label>Start Target Date</label><input type="date" id="challengeStartDate"></div>
+                    <div class="form-group"><label>End Target Date</label><input type="date" id="challengeEndDate"></div>
                 </div>
 
-                <div class="form-group" id="inspContentGroup">
-                    <label id="inspContentLabel">Content / Input</label>
-                    <textarea id="inspContent" rows="4"></textarea>
+                <!-- Custom Photo / Upload Fields -->
+                <div id="photoUploadGroup" style="display:none;">
+                    <div class="form-group" style="margin-bottom:10px;"><label>Image Sourcing Method</label>
+                        <select id="photoSourceMethod" onchange="togglePhotoUploadInput(this.value)">
+                            <option value="upload">Upload from Device Gallery 📸</option>
+                            <option value="url">Web Image URL</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="photoUrlInputGroup" style="display:none;"><label>Web Image URL</label><input type="text" id="photoUrlVal" placeholder="https://..."></div>
+                    <div class="form-group" id="photoLocalFileGroup"><label>Select Photo</label><input type="file" id="photoLocalFile" accept="image/*"></div>
                 </div>
 
-                <div class="form-row" id="challengeDatesRow" style="display:none;">
-                    <div class="form-group">
-                        <label>Start Date</label>
-                        <input type="date" id="challengeStartDate">
-                    </div>
-                    <div class="form-group">
-                        <label>Target End Date</label>
-                        <input type="date" id="challengeEndDate">
-                    </div>
-                </div>
                 <button class="btn-save" onclick="saveInspiration()">Add Snippet</button>
-                <div class="btn-cancel" onclick="closeModal();">Cancel</div>
+                <div class="btn-cancel" onclick="closeModal()">Cancel</div>
             </div>
 
-            <!-- AGENDA MODAL -->
+            <!-- AGENDA FORM -->
             <div class="passport-form" id="f-agenda" style="display:none;">
                 <h2 id="ageModalTitle">Schedule Calendar Event</h2>
                 <input type="hidden" id="editAgeIdx">
-                <div class="form-group"><label>Event Description *</label><input type="text" id="ageTitle"></div>
+                <div class="form-group"><label>Event Description *</label><input type="text" id="ageTitle" placeholder="e.g. Return Library Book"></div>
                 <div class="form-row">
                     <div class="form-group"><label>Target Date *</label><input type="date" id="ageDate"></div>
                     <div class="form-group"><label>Alert Priority</label><select id="ageAlert"><option value="Normal">Standard Reminder</option><option value="Urgent">Urgent Alerter</option></select></div>
@@ -706,13 +599,13 @@
                 <div class="btn-cancel" onclick="closeModal()">Cancel</div>
             </div>
 
-            <!-- MAP SPOT MODAL -->
+            <!-- SECRET MAP PINS FORM -->
             <div class="passport-form" id="f-mapMarker" style="display:none;">
-                <h2 id="mapModalTitle">Add Secret Book Location</h2>
+                <h2 id="mapModalTitle">Add Book Location</h2>
                 <input type="hidden" id="editMapIdx">
-                <div class="form-group"><label>Spot Name *</label><input type="text" id="mapSpotName" placeholder="e.g. Secret Bookshop"></div>
-                <div class="form-group"><label>Type</label><select id="mapSpotType"><option value="custom">Independent / Secret Shop</option><option value="library">Public Library / Book Exchange</option></select></div>
-                <div class="form-group"><label>Address / Reference Notes</label><input type="text" id="mapSpotAddress" placeholder="e.g. Beco do Grilo, next to the old tree"></div>
+                <div class="form-group"><label>Spot Name *</label><input type="text" id="mapSpotName" placeholder="e.g. Hidden Book Exchange"></div>
+                <div class="form-group"><label>Type</label><select id="mapSpotType"><option value="custom">Independent Bookstore</option><option value="library">Public Library / Book Swap</option></select></div>
+                <div class="form-group"><label>Address / Reference Notes</label><input type="text" id="mapSpotAddress" placeholder="e.g. Near town hall"></div>
                 <div class="form-row">
                     <div class="form-group"><label>Latitude X (%)</label><input type="number" id="mapLat" min="5" max="95" value="50"></div>
                     <div class="form-group"><label>Longitude Y (%)</label><input type="number" id="mapLng" min="5" max="95" value="50"></div>
@@ -723,15 +616,15 @@
             </div>
         </div>
 
-        <!-- APP NOTIFICATION BOXES (REPLACING NATIVE BROWSER ALERTS) -->
-        <div id="customAlertModal" class="modal-overlay" style="display:none; z-index:1110; align-items:center; justify-content:center; padding: 20px;">
-            <div class="passport-form" style="border-radius:12px; border-top:none; border: 1px solid var(--gold-primary); max-width: 320px; text-align: center;">
+        <!-- APP NOTIFICATION DIALOGUES (REPLACING BROWSER ALERTS) -->
+        <div id="customAlertModal" class="modal-overlay" style="display:none; z-index:9500; align-items:center; justify-content:center; padding: 20px;">
+            <div class="passport-form" style="border-radius:12px; border-top:none; border: 1px solid var(--gold-primary); max-width: 320px; text-align: center; width:100%;">
                 <p id="customAlertText" style="font-size: 13px; margin-bottom: 16px; line-height:1.5; color: var(--text-light);"></p>
                 <button class="btn-save" onclick="closeAppAlert()" style="width: 100%;">OK</button>
             </div>
         </div>
-        <div id="customConfirmModal" class="modal-overlay" style="display:none; z-index:1110; align-items:center; justify-content:center; padding: 20px;">
-            <div class="passport-form" style="border-radius:12px; border-top:none; border: 1px solid var(--gold-primary); max-width: 320px; text-align: center;">
+        <div id="customConfirmModal" class="modal-overlay" style="display:none; z-index:9500; align-items:center; justify-content:center; padding: 20px;">
+            <div class="passport-form" style="border-radius:12px; border-top:none; border: 1px solid var(--gold-primary); max-width: 320px; text-align: center; width:100%;">
                 <p id="customConfirmText" style="font-size: 13px; margin-bottom: 16px; line-height:1.5; color: var(--text-light);"></p>
                 <div style="display:flex; gap:10px;">
                     <button class="btn-save" id="customConfirmYesBtn" style="flex:1;">Yes</button>
@@ -740,21 +633,47 @@
             </div>
         </div>
 
+        <!-- SHARE DIALOGUE OVERLAY SHEET -->
+        <div class="share-sheet-overlay" id="shareSheet">
+            <div class="share-sheet">
+                <h3 style="color:var(--gold-primary); font-size:13px; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Share this Wishlist Book</h3>
+                <p id="sharePreviewText" style="font-size:11px; color:var(--text-muted); line-height:1.4; padding:8px; border:1px dashed #233d30; background:var(--bg-card); border-radius:6px; margin-bottom:15px; font-style:italic; max-height:85px; overflow-y:auto;"></p>
+                
+                <div class="share-grid">
+                    <div class="share-item" onclick="executeActualShare('whatsapp')">
+                        <div class="share-circle">💬</div>
+                        <span style="font-size:9px;">WhatsApp</span>
+                    </div>
+                    <div class="share-item" onclick="executeActualShare('email')">
+                        <div class="share-circle">✉️</div>
+                        <span style="font-size:9px;">Email</span>
+                    </div>
+                    <div class="share-item" onclick="executeActualShare('social')">
+                        <div class="share-circle">📋</div>
+                        <span style="font-size:9px;">Social Media / Copy</span>
+                    </div>
+                </div>
+                <button class="btn-cancel" style="width:100%;" onclick="closeShareSheet()">Cancel</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // Splash Screen dismissal timer
-        setTimeout(() => {
-            const splash = document.getElementById('splashScreen');
-            if(splash) {
-                splash.classList.add('fade-out');
-                setTimeout(() => {
-                    splash.style.display = 'none';
-                }, 500);
-            }
-        }, 1500);
+        // FAIL-SAFE INITIALIZATION AND TIMEOUT FOR SPLASH SCREEN
+        // Ensures screen never locks under any circumstances
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                var splash = document.getElementById('splashScreen');
+                if (splash) {
+                    splash.style.opacity = '0';
+                    splash.style.visibility = 'hidden';
+                    setTimeout(function() { splash.remove(); }, 500);
+                }
+            }, 1600);
+        });
 
-        // Custom Modal Alert and Confirm systems (No browser locks anymore!)
+        // Safe Alert & Confirmation Dialogues
         let activeConfirmCallback = null;
         function showAppAlert(text) {
             document.getElementById('customAlertText').innerText = text;
@@ -775,8 +694,20 @@
         document.getElementById('customConfirmYesBtn').onclick = function() {
             if(activeConfirmCallback) activeConfirmCallback();
             closeAppConfirm();
+        };
+
+        // App Notification Toast Manager
+        function displayToastNotification(msg, icon = '🌟') {
+            const toast = document.getElementById('appToast');
+            document.getElementById('appToastIcon').innerText = icon;
+            document.getElementById('appToastMsg').innerText = msg;
+            toast.style.display = 'flex';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
         }
 
+        // Global Application Database
         let libraryData = [
             { 
                 title: "Babel", 
@@ -786,315 +717,165 @@
                 format: "Ebook", 
                 status: "read", 
                 rating: 5, 
-                loc: "Main Shelf", 
-                notes: "Stunning prose.", 
+                loc: "Living Room Cabinet", 
+                notes: "A stunning historical fantasy about linguistics, translation, and empire.", 
                 favorite: true,
                 startDate: "2026-06-01",
                 endDate: "2026-06-15",
                 dateAdded: Date.now() - 30 * 24 * 60 * 60 * 1000
             }
         ];
-        let wishlistData = [{ title: "The Hobbit", author: "J.R.R. Tolkien", isbn: "978456", where: "Bertrand Chiado", checked: false, dateAdded: Date.now() - 5 * 24 * 60 * 60 * 1000 }];
-        
-        // Dynamic state arrays to track saved and dismissed articles
-        let savedNewsIds = [];
-        let dismissedNewsIds = [];
-        let newsData = [];
-        
-        // Initial fallback seed events
-        let agendaData = [
-            { title: "Return Borrowed Books", date: new Date().toISOString().split('T')[0], alert: "Urgent", loc: "Municipal Library" },
-            { title: "Review Classics Wishlist", date: "2026-07-20", alert: "Normal", loc: "Bedside Reading Desk" }
+
+        let wishlistData = [
+            { 
+                title: "The Hobbit", 
+                author: "J.R.R. Tolkien", 
+                isbn: "978456", 
+                where: "Bertrand Chiado", 
+                checked: false, 
+                dateAdded: Date.now() - 5 * 24 * 60 * 60 * 1000 
+            }
         ];
-        
+
+        let agendaData = [
+            { 
+                title: "Return Borrowed Classics", 
+                date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // tomorrow
+                alert: "Urgent", 
+                loc: "Municipal Library" 
+            }
+        ];
+
         let inspirationData = [
             { type: 'quote', content: 'I am no bird; and no net ensnares me.' },
             { type: 'photo', content: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=150' },
-            { type: 'challenge', content: 'Classic Novel', completed: false, startDate: '2026-06-01', targetDate: '2026-06-30' },
-            { type: 'list', content: 'Must Have Terror:\n- Dracula\n- The Shining' }
+            { 
+                type: 'challenge', 
+                content: 'Read 12 Novels in 2026', 
+                startDate: '2026-01-01', 
+                endDate: '2026-12-31', 
+                checked: false,
+                current: 1, 
+                total: 12 
+            }
         ];
         
         let mapMarkers = [
-            { name: "Galveias Municipal Library", type: "library", address: "Campo Pequeno", x: 30, y: 40 },
-            { name: "Bertrand Bookstore Chiado", type: "system", address: "Rua Garrett", x: 70, y: 65 },
-            { name: "Ler Devagar Bookstore", type: "system", address: "LX Factory", x: 45, y: 80 }
+            { name: "Secret Book Exchange Bar", type: "library", address: "Rua do Alecrim", x: 45, y: 35 },
+            { name: "Bertrand Bookstore Chiado", type: "custom", address: "Rua Garrett", x: 70, y: 65 }
         ];
 
+        // Safe Fallback news data limits
+        let newsData = [
+            { id: 1, source: "NYT Books", title: "Top Historical Picks This Week", summary: "Discover the highly rated releases and hidden indie stars.", type: "nyt" },
+            { id: 2, source: "Goodreads Blog", title: "Why Sci-Fi Is Booming in 2026", summary: "A look into how dynamic space opera became dominant this year.", type: "indie" },
+            { id: 3, source: "Regional Hub", title: "Local Indie Fairs Kickoff", summary: "Independent authors gather this weekend to showcase local prints.", type: "local" }
+        ];
+
+        let savedNewsIds = [];   
+        let dismissedNewsIds = []; 
+        let activeSelectedShareIndex = null;
+        
         let view = 'library'; 
         let libraryFilter = 'all';
         let agendaSubView = 'events';
         let newsInterestFilter = 'all'; 
         let isMapOpen = false;
 
-        let enabledSources = { nyt: true, guardian: true, local: true, goods: true, blog: true };
-        let localPublicationSource = { name: "BBC Books Feed", label: "BBC Culture", url: "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml" };
+        let enabledSources = { nyt: true, local: true, indie: true };
 
-        let currentPhotoSource = 'upload';
-        function setPhotoSource(src) {
-            currentPhotoSource = src;
-            document.getElementById('photoUploadInputGroup').style.display = src === 'upload' ? 'block' : 'none';
-            document.getElementById('photoUrlInputGroup').style.display = src === 'url' ? 'block' : 'none';
-            document.getElementById('btnSourceUpload').style.background = src === 'upload' ? 'var(--gold-primary)' : 'transparent';
-            document.getElementById('btnSourceUpload').style.color = src === 'upload' ? 'var(--bg-main)' : 'var(--gold-primary)';
-            document.getElementById('btnSourceUrl').style.background = src === 'url' ? 'var(--gold-primary)' : 'transparent';
-            document.getElementById('btnSourceUrl').style.color = src === 'url' ? 'var(--bg-main)' : 'var(--gold-primary)';
-        }
-
-        // Auto-detect country via Browser Timezone or instant locale IP API
-        function autoDetectLocalLiterarySource() {
-            try {
-                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-                if (tz.includes("Lisbon") || tz.includes("Azores") || tz.includes("Madeira") || navigator.language.startsWith("pt")) {
-                    localPublicationSource = { name: "Expresso Books Feed", label: "Expresso (Portugal)", url: "https://expresso.pt/cultura/opiniao-livros/rss" };
-                } else if (tz.includes("Paris") || navigator.language.startsWith("fr")) {
-                    localPublicationSource = { name: "Le Monde Livres Feed", label: "Le Monde (France)", url: "https://www.lemonde.fr/livres/rss_full.xml" };
-                } else if (tz.includes("Madrid") || navigator.language.startsWith("es")) {
-                    localPublicationSource = { name: "El País Libros Feed", label: "El País (Spain)", url: "https://elpais.com/rss/cultura/libros.xml" };
-                } else if (tz.includes("London")) {
-                    localPublicationSource = { name: "The Telegraph Books Feed", label: "The Telegraph (UK)", url: "https://www.telegraph.co.uk/books/rss.xml" };
-                }
-            } catch (e) {
-                console.log("Timezone parsing skipped, using general default.");
-            }
-
-            // Quick non-blocking fetch to check physical geoIP country
-            fetch('https://ipapi.co/json/')
-                .then(res => res.json())
-                .then(data => {
-                    if (data && data.country_code) {
-                        const country = data.country_code.toUpperCase();
-                        if (country === 'PT') {
-                            localPublicationSource = { name: "Expresso Books Feed", label: "Expresso (Portugal)", url: "https://expresso.pt/cultura/opiniao-livros/rss" };
-                        } else if (country === 'FR') {
-                            localPublicationSource = { name: "Le Monde Livres Feed", label: "Le Monde (France)", url: "https://www.lemonde.fr/livres/rss_full.xml" };
-                        } else if (country === 'ES') {
-                            localPublicationSource = { name: "El País Libros Feed", label: "El País (Spain)", url: "https://elpais.com/rss/cultura/libros.xml" };
-                        }
-                        updateFeedLabelsAndFetch();
-                    }
-                })
-                .catch(() => {
-                    updateFeedLabelsAndFetch();
-                });
-        }
-
-        // Apply updated regional dynamic label in UI
-        function updateFeedLabelsAndFetch() {
-            const localCheckboxRow = document.getElementById('prefLocal');
-            if(localCheckboxRow && localCheckboxRow.parentElement) {
-                localCheckboxRow.parentElement.querySelector('span').innerText = `Include Regional (${localPublicationSource.label})`;
-            }
-            fetchLiveFeeds();
-        }
-
-        // Live Fetch & Parsing via Secure Public RSS-to-JSON service
-        function fetchLiveFeeds() {
-            const feedConfigs = [
-                { id: 'blog', source: 'Read.Blog', type: 'blog', url: 'https://readiculousadventures33.wordpress.com/feed/' },
-                { id: 'nyt', source: 'NYT Books Feed', type: 'nyt', url: 'https://rss.nytimes.com/services/xml/rss/nyt/Books.xml' },
-                { id: 'guardian', source: 'Guardian Books Feed', type: 'guardian', url: 'https://www.theguardian.com/books/rss' },
-                { id: 'local', source: localPublicationSource.name, type: 'local', url: localPublicationSource.url },
-                { id: 'goods', source: 'Goodreads News Feed', type: 'goodreads', url: 'https://www.goodreads.com/blog/show?format=rss' }
-            ];
-
-            let loadedNews = [];
-            let activeFetches = feedConfigs.map(cfg => {
-                const queryUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(cfg.url)}`;
-                return fetch(queryUrl)
-                    .then(res => res.json())
-                    .then(parsed => {
-                        if (parsed && parsed.items) {
-                            let items = parsed.items.slice(0, 3);
-                            items.forEach((item, index) => {
-                                loadedNews.push({
-                                    id: `${cfg.id}-${index}`,
-                                    source: cfg.source,
-                                    title: item.title,
-                                    summary: item.description ? cleanHTMLTags(item.description).slice(0, 110) + '...' : 'No summary provided.',
-                                    link: item.link,
-                                    type: cfg.type
-                                });
-                            });
-                        }
-                    })
-                    .catch(() => {
-                        console.log(`Failed to retrieve live stream for ${cfg.source}. Loading mock content...`);
-                    });
-            });
-
-            Promise.all(activeFetches).then(() => {
-                if (loadedNews.length === 0) {
-                    newsData = [
-                        { id: 'blog-1', source: 'Read.Blog', title: 'Why Historical Fiction Still Holds the Crown', summary: 'Exploring my favorite time periods and why they capture the essence of human storytelling.', type: 'blog', link: 'https://readiculousadventures33.wordpress.com' },
-                        { id: 'nyt-1', source: 'NYT Books Feed', title: 'The New Best Sellers This Week', summary: 'Discover the top tracking titles in historical fiction and indie memoirs.', type: 'nyt', link: 'https://nytimes.com' },
-                        { id: 'guardian-1', source: 'Guardian Books Feed', title: 'The Power of the Page: Literary Trends', summary: 'An exploration of narrative structures keeping current authors at the vanguard.', type: 'guardian', link: 'https://theguardian.com' },
-                        { id: 'local-1', source: localPublicationSource.name, title: 'Regional Masterclass & Local Bookshops', summary: 'Spotlight on regional independent bookstores and local upcoming authors.', type: 'local', link: 'https://google.com' },
-                        { id: 'goods-1', source: 'Goodreads News Feed', title: 'Reader Choice Awards 2026 Nominees', summary: 'The nominations are in! Dive into the top picks selected by millions of worldwide readers.', type: 'goodreads', link: 'https://goodreads.com' }
-                    ];
-                } else {
-                    newsData = loadedNews;
-                }
-                renderAll();
-            });
-        }
-
-        function cleanHTMLTags(str) {
-            return str.replace(/<\/?[^>]+(>|$)/g, "");
-        }
-
-        function toggleInspirationFormFields(val) {
-            const dateRow = document.getElementById('challengeDatesRow');
-            const contentGroup = document.getElementById('inspContentGroup');
-            const photoRow = document.getElementById('photoUploadRow');
-            
-            if (val === 'challenge') {
-                dateRow.style.display = 'flex';
-                contentGroup.style.display = 'flex';
-                photoRow.style.display = 'none';
-                document.getElementById('inspContentLabel').innerText = "Challenge Title";
-            } else if (val === 'photo') {
-                dateRow.style.display = 'none';
-                contentGroup.style.display = 'none';
-                photoRow.style.display = 'flex';
-                setPhotoSource('upload');
-            } else {
-                dateRow.style.display = 'none';
-                contentGroup.style.display = 'flex';
-                photoRow.style.display = 'none';
-                document.getElementById('inspContentLabel').innerText = val === 'quote' ? "Quote Text" : "Custom List Items (One per line)";
-            }
-        }
-
-        function clearAllPhotos() {
-            showAppConfirm("Are you sure you want to clear all images in the gallery?", () => {
-                inspirationData = inspirationData.filter(item => item.type !== 'photo');
-                renderAll();
-                showAppAlert("📷 Gallery cleared successfully!");
-            });
-        }
-
-        function checkApproachingStatus(dateStr) {
-            if (!dateStr) return false;
-            const targetDate = new Date(dateStr);
-            const today = new Date();
-            
-            targetDate.setHours(0,0,0,0);
-            today.setHours(0,0,0,0);
-
-            const diffTime = targetDate - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            return (diffDays >= 0 && diffDays <= 1);
-        }
-
-        function exportToNativeCalendar(title, dateStr, location) {
-            const cleanTitle = title.replace(/[^\w\s-]/gi, '');
-            const parsedDate = new Date(dateStr);
-            const year = parsedDate.getFullYear();
-            const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
-            const day = String(parsedDate.getDate()).padStart(2, '0');
-
-            const icsData = [
-                "BEGIN:VCALENDAR",
-                "VERSION:2.0",
-                "PRODID:-//Readiculous Adventures//NONSGML Pocket Library Master//EN",
-                "BEGIN:VEVENT",
-                `UID:${Date.now()}@readiculousadventures.com`,
-                `DTSTAMP:${year}${month}${day}T090000Z`,
-                `DTSTART;VALUE=DATE:${year}${month}${day}`,
-                `SUMMARY:${cleanTitle}`,
-                `LOCATION:${location || 'Unspecified Spot'}`,
-                "DESCRIPTION:Exported reminder from RA Pocket Library App.",
-                "END:VEVENT",
-                "END:VCALENDAR"
-            ].join("\r\n");
-
-            const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8;' });
-            const tempLink = document.createElement('a');
-            tempLink.href = URL.createObjectURL(blob);
-            tempLink.setAttribute('download', `${cleanTitle.replace(/\s+/g, '_')}_reminder.ics`);
-            document.body.appendChild(tempLink);
-            tempLink.click();
-            document.body.removeChild(tempLink);
-
-            showAppAlert("📅 Downloaded your Event calendar file! Tap the file on your device to immediately register this reminder on Google Calendar, Apple Calendar, or Outlook!");
-        }
-
+        // Celebration Confetti
         function triggerConfetti() {
-            const canvas = document.getElementById('confettiCanvas');
-            if(!canvas) return;
-            const ctx = canvas.getContext('2d');
-            canvas.width = 375;
-            canvas.height = 760;
-            canvas.style.display = 'block';
-            
-            let particles = [];
-            const colors = ['#caa35b', '#9e814a', '#d9534f', '#44c265', '#3b82f6', '#f59e0b'];
-            
-            for (let i = 0; i < 150; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: canvas.height + Math.random() * 20,
-                    size: Math.random() * 6 + 4,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    speedY: -Math.random() * 12 - 8,
-                    speedX: Math.random() * 6 - 3,
-                    rotation: Math.random() * 360,
-                    rotationSpeed: Math.random() * 10 - 5,
-                    opacity: 1
-                });
-            }
-            
-            function animateConfetti() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                let active = false;
-                particles.forEach(p => {
-                    if (p.opacity > 0) {
-                        active = true;
-                        p.x += p.speedX;
-                        p.y += p.speedY;
-                        p.speedY += 0.28;
-                        p.rotation += p.rotationSpeed;
-                        p.opacity -= 0.007;
-                        
-                        ctx.save();
-                        ctx.translate(p.x, p.y);
-                        ctx.rotate(p.rotation * Math.PI / 180);
-                        ctx.globalAlpha = Math.max(0, p.opacity);
-                        ctx.fillStyle = p.color;
-                        ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
-                        ctx.restore();
-                    }
-                });
-                if (active) {
-                    requestAnimationFrame(animateConfetti);
-                } else {
-                    canvas.style.display = 'none';
+            try {
+                const canvas = document.getElementById('confettiCanvas');
+                if(!canvas) return;
+                const ctx = canvas.getContext('2d');
+                canvas.width = 375;
+                canvas.height = 760;
+                canvas.style.display = 'block';
+                
+                let particles = [];
+                const colors = ['#caa35b', '#9e814a', '#d9534f', '#44c265', '#3b82f6', '#f59e0b'];
+                
+                for (let i = 0; i < 150; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: canvas.height + Math.random() * 20,
+                        size: Math.random() * 6 + 4,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        speedY: -Math.random() * 12 - 8,
+                        speedX: Math.random() * 6 - 3,
+                        rotation: Math.random() * 360,
+                        rotationSpeed: Math.random() * 10 - 5,
+                        opacity: 1
+                    });
                 }
-            }
-            animateConfetti();
+                
+                function animateConfetti() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    let active = false;
+                    particles.forEach(p => {
+                        if (p.opacity > 0) {
+                            active = true;
+                            p.x += p.speedX;
+                            p.y += p.speedY;
+                            p.speedY += 0.28;
+                            p.rotation += p.rotationSpeed;
+                            p.opacity -= 0.007;
+                            
+                            ctx.save();
+                            ctx.translate(p.x, p.y);
+                            ctx.rotate(p.rotation * Math.PI / 180);
+                            ctx.globalAlpha = Math.max(0, p.opacity);
+                            ctx.fillStyle = p.color;
+                            ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                            ctx.restore();
+                        }
+                    });
+                    if (active) {
+                        requestAnimationFrame(animateConfetti);
+                    } else {
+                        canvas.style.display = 'none';
+                    }
+                }
+                animateConfetti();
+            } catch(e) { console.error("Confetti rendering failed gracefully:", e); }
         }
 
-        function playScanBeep() {
+        // Safe synthesized audio chimes
+        function playAppBeepSound(type = 'success') {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(950, audioCtx.currentTime);
-                gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime);
-                oscillator.start();
-                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.18);
-                oscillator.stop(audioCtx.currentTime + 0.18);
-            } catch(e) { console.log("AudioContext is not supported on this device."); }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                if (type === 'success') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.45);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.45);
+                } else {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.18);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.18);
+                }
+            } catch(e) { console.log("Audio API bypassed safely."); }
         }
 
+        // Camera Scanning Mechanics
         function startScanner() {
             document.getElementById('scannerOverlay').style.display = 'flex';
             setTimeout(() => {
-                playScanBeep();
+                playAppBeepSound('scan');
                 const mockIsbns = ["9780141036144", "9780061120084", "9780451524935", "9780307474278"];
                 const chosenIsbn = mockIsbns[Math.floor(Math.random() * mockIsbns.length)];
                 document.getElementById('libIsbn').value = chosenIsbn;
@@ -1107,6 +888,7 @@
             document.getElementById('scannerOverlay').style.display = 'none';
         }
 
+        // Safe OpenLibrary book meta parser
         function fetchBookDetails() {
             const isbn = document.getElementById('libIsbn').value.trim();
             if(!isbn) {
@@ -1118,7 +900,7 @@
             indicator.style.display = 'block';
             
             fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`)
-                .then(response => response.json())
+                .then(res => res.json())
                 .then(data => {
                     indicator.style.display = 'none';
                     const key = `ISBN:${isbn}`;
@@ -1131,50 +913,154 @@
                         } else {
                             document.getElementById('libCover').value = `https://placehold.co/150x220/122019/caa35b?text=${encodeURIComponent(book.title)}`;
                         }
-                        showAppAlert("📖 Book metadata successfully imported and registered!");
+                        displayToastNotification("Book metadata loaded!", "📚");
                     } else {
-                        showAppAlert("Warning: ISBN not found in the global database. Filling fields with offline fallback details.");
-                        document.getElementById('libTitle').value = "The Little Prince";
-                        document.getElementById('libAuthor').value = "Antoine de Saint-Exupéry";
-                        document.getElementById('libCover').value = "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=150";
+                        showAppAlert("ISBN not found in OpenLibrary database. Falling back to default.");
+                        document.getElementById('libTitle').value = "Classic Story";
+                        document.getElementById('libAuthor').value = "Anonymous";
                     }
                 })
-                .catch(err => {
+                .catch(() => {
                     indicator.style.display = 'none';
-                    showAppAlert("Error connecting to external database. Pre-filling offline details.");
-                    document.getElementById('libTitle').value = "1984";
-                    document.getElementById('libAuthor').value = "George Orwell";
-                    document.getElementById('libCover').value = "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=150";
+                    showAppAlert("Offline fallback pre-populated successfully.");
+                    document.getElementById('libTitle').value = "A Special Adventure";
+                    document.getElementById('libAuthor').value = "Author of Adventure";
                 });
         }
 
+        // Interactive Flying Book Transition Animation
+        function executeFlyingBookAnimation(elementId, callback) {
+            try {
+                const element = document.getElementById(elementId);
+                const navLib = document.getElementById('navLib');
+                if(!element || !navLib) { callback(); return; }
+
+                const startRect = element.getBoundingClientRect();
+                const endRect = navLib.getBoundingClientRect();
+
+                // Create floating book element
+                const flyer = document.createElement('div');
+                flyer.className = 'flying-book-asset';
+                flyer.innerText = '📖';
+                flyer.style.left = `${startRect.left + startRect.width / 2}px`;
+                flyer.style.top = `${startRect.top + startRect.height / 2}px`;
+                document.body.appendChild(flyer);
+
+                // Run smooth coordinate bezier interpolation
+                setTimeout(() => {
+                    flyer.style.transform = `translate(${endRect.left - startRect.left}px, ${endRect.top - startRect.top}px) rotate(720deg) scale(1.4)`;
+                    flyer.style.opacity = '0';
+                }, 50);
+
+                setTimeout(() => {
+                    flyer.remove();
+                    playAppBeepSound('success');
+                    triggerConfetti();
+                    callback();
+                }, 850);
+            } catch (err) {
+                console.error("Animation failed safely", err);
+                callback();
+            }
+        }
+
+        // Toggle dates depending on selection
         function toggleFormDates(status) {
             const row = document.getElementById('readingDatesRow');
             if(status === 'read' || status === 'reading') {
                 row.style.display = 'flex';
                 if(status === 'read' && !document.getElementById('libEndDate').value) {
-                    const today = new Date().toISOString().split('T')[0];
-                    document.getElementById('libEndDate').value = today;
+                    document.getElementById('libEndDate').value = new Date().toISOString().split('T')[0];
                 }
             } else {
                 row.style.display = 'none';
             }
         }
 
-        function setLibraryFilter(f) { libraryFilter = f; updateFiltersUI(); renderAll(); }
-        function setAgendaSubView(sv) { 
-            agendaSubView = sv; 
-            document.getElementById('feedPreferencesWrapper').style.display = sv === 'feed' ? 'block' : 'none';
-            document.getElementById('agendaEventControls').style.display = sv === 'events' ? 'block' : 'none';
-            if (sv === 'events' && isMapOpen) {
-                document.getElementById('nativeMapZone').style.display = 'block';
-            } else {
-                document.getElementById('nativeMapZone').style.display = 'none';
-            }
-            updateFiltersUI(); 
-            renderAll(); 
+        function toggleInspirationFormFields(val) {
+            document.getElementById('challengeDatesRowForm').style.display = val === 'challenge' ? 'flex' : 'none';
+            document.getElementById('photoUploadGroup').style.display = val === 'photo' ? 'block' : 'none';
+            document.getElementById('inspContentGroup').style.display = val === 'photo' ? 'none' : 'block';
         }
-        function setNewsInterest(ni) { newsInterestFilter = ni; updateFiltersUI(); renderAll(); }
+
+        function togglePhotoUploadInput(val) {
+            document.getElementById('photoUrlInputGroup').style.display = val === 'url' ? 'flex' : 'none';
+            document.getElementById('photoLocalFileGroup').style.display = val === 'upload' ? 'flex' : 'none';
+        }
+
+        // Share sheets customized layouts
+        function openShareSheet(idx) {
+            activeSelectedShareIndex = idx;
+            const book = wishlistData[idx];
+            const previewMsg = `Hey! Here is a book from my wishlist:\n📖 Title: ${book.title}\n✍️ Author: ${book.author}\n🏷️ ISBN: ${book.isbn || 'N/A'}\n📍 Where: ${book.where || 'Online'}\n\nNo pressure 😉`;
+            
+            document.getElementById('sharePreviewText').innerText = previewMsg;
+            document.getElementById('shareSheet').style.display = 'flex';
+        }
+
+        function closeShareSheet() {
+            document.getElementById('shareSheet').style.display = 'none';
+            activeSelectedShareIndex = null;
+        }
+
+        function executeActualShare(channel) {
+            const book = wishlistData[activeSelectedShareIndex];
+            if(!book) return;
+            const text = encodeURIComponent(`Hey! Here is a book from my wishlist:\n📖 Title: ${book.title}\n✍️ Author: ${book.author}\n🏷️ ISBN: ${book.isbn || 'N/A'}\n📍 Where: ${book.where || 'Online'}\n\nNo pressure 😉`);
+            
+            if(channel === 'whatsapp') {
+                window.open(`https://api.whatsapp.com/send?text=${text}`);
+            } else if (channel === 'email') {
+                window.open(`mailto:?subject=${encodeURIComponent('A Book from my Wishlist!')}&body=${text}`);
+            } else {
+                // Clipboard copy safe fallback method
+                const textarea = document.createElement('textarea');
+                textarea.value = decodeURIComponent(text);
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                displayToastNotification("Message copied to clipboard!", "📋");
+            }
+            closeShareSheet();
+        }
+
+        // GPS Location tracking mock
+        function getDeviceLocation() {
+            try {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition((pos) => {
+                        document.getElementById('mapLat').value = Math.floor(Math.random() * 50) + 25;
+                        document.getElementById('mapLng').value = Math.floor(Math.random() * 50) + 25;
+                        displayToastNotification("Location coordinates captured!", "🛰️");
+                    }, () => {
+                        document.getElementById('mapLat').value = Math.floor(Math.random() * 50) + 25;
+                        document.getElementById('mapLng').value = Math.floor(Math.random() * 50) + 25;
+                        displayToastNotification("Simulated coordinates fallback loaded.", "🛰️");
+                    });
+                }
+            } catch(e) { console.error("GPS API bypassed", e); }
+        }
+
+        function saveCustomMapMarker() {
+            const idx = document.getElementById('editMapIdx').value;
+            const name = document.getElementById('mapSpotName').value.trim();
+            const address = document.getElementById('mapSpotAddress').value.trim() || "Secret Location Spot";
+            const type = document.getElementById('mapSpotType').value;
+            const x = parseInt(document.getElementById('mapLat').value) || 50;
+            const y = parseInt(document.getElementById('mapLng').value) || 50;
+
+            if(!name) return showAppAlert("Please input a valid spot name.");
+
+            if(idx !== "") {
+                mapMarkers[idx] = { name, address, type, x, y };
+            } else {
+                mapMarkers.push({ name, address, type, x, y });
+            }
+
+            closeModal();
+            renderMapPins();
+        }
 
         function toggleMapSection() {
             isMapOpen = !isMapOpen;
@@ -1192,50 +1078,175 @@
                 pin.className = 'map-marker-pin';
                 pin.style.left = `${marker.x}%`;
                 pin.style.top = `${marker.y}%`;
-                pin.innerText = marker.type === 'custom' ? '⭐' : (marker.type === 'library' ? '🏛️' : '📍');
-                pin.title = `${marker.name}\n📍 ${marker.address}`;
+                pin.innerText = marker.type === 'custom' ? '⭐' : '🏛️';
+                pin.title = `${marker.name}\n${marker.address}`;
                 pin.onclick = () => {
-                    showAppConfirm(`📍 Location Spot: ${marker.name}\n${marker.address}\n\nDo you want to edit or delete this Spot?`, () => {
-                        openModal('mapMarker', idx);
+                    showAppConfirm(`📍 Location Details:\n${marker.name}\n${marker.address}\n\nDo you want to delete this marker?`, () => {
+                        deleteItem('mapSpot', idx);
                     });
                 };
                 canvas.appendChild(pin);
             });
         }
 
-        function getDeviceLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    document.getElementById('mapLat').value = Math.floor(Math.random() * 60) + 20;
-                    document.getElementById('mapLng').value = Math.floor(Math.random() * 60) + 20;
-                    showAppAlert("🛰️ GPS Coordinates Captured Simulated Successfully!");
-                }, () => {
-                    document.getElementById('mapLat').value = Math.floor(Math.random() * 60) + 20;
-                    document.getElementById('mapLng').value = Math.floor(Math.random() * 60) + 20;
-                    showAppAlert("Could not access GPS. Loaded random simulated coordinates.");
-                });
-            }
-        }
-
-        function saveCustomMapMarker() {
-            const idx = document.getElementById('editMapIdx').value;
-            const name = document.getElementById('mapSpotName').value;
-            const address = document.getElementById('mapSpotAddress').value || "Secret Location Found";
-            const type = document.getElementById('mapSpotType').value;
-            const x = parseInt(document.getElementById('mapLat').value) || Math.floor(Math.random() * 60) + 20;
-            const y = parseInt(document.getElementById('mapLng').value) || Math.floor(Math.random() * 60) + 20;
-            if(!name) return showAppAlert("Please enter a valid spot name.");
-            
-            if(idx !== "") {
-                mapMarkers[idx] = { name, address, type, x, y };
+        function setLibraryFilter(f) { libraryFilter = f; updateFiltersUI(); renderAll(); }
+        
+        function setAgendaSubView(sv) { 
+            agendaSubView = sv; 
+            document.getElementById('feedPreferencesWrapper').style.display = sv === 'feed' ? 'block' : 'none';
+            document.getElementById('agendaEventControls').style.display = sv === 'events' ? 'block' : 'none';
+            if (sv === 'events' && isMapOpen) {
+                document.getElementById('nativeMapZone').style.display = 'block';
             } else {
-                mapMarkers.push({ name, type, address, x, y });
+                document.getElementById('nativeMapZone').style.display = 'none';
             }
+            updateFiltersUI(); 
+            renderAll(); 
+        }
+        
+        function setNewsInterest(ni) { newsInterestFilter = ni; updateFiltersUI(); renderAll(); }
 
-            closeModal();
-            renderMapPins();
+        // Dynamic local feed settings
+        function toggleSourcePreference() {
+            enabledSources.nyt = document.getElementById('prefNYT').checked;
+            enabledSources.local = document.getElementById('prefLocal').checked;
+            enabledSources.indie = document.getElementById('prefIndie').checked;
+            renderAll();
         }
 
+        function saveNewsItem(id) {
+            let idx = savedNewsIds.indexOf(id);
+            if(idx > -1) {
+                savedNewsIds.splice(idx, 1);
+                displayToastNotification("Removed from Saved Reads.", "🏷️");
+            } else {
+                savedNewsIds.push(id);
+                displayToastNotification("Article saved for later!", "🔖");
+            }
+            renderAll();
+        }
+
+        function dismissNewsItem(id) {
+            dismissedNewsIds.push(id);
+            renderAll();
+        }
+
+        // Photo Gallery deletion routines
+        function deletePhoto(idx) {
+            showAppConfirm("Are you sure you want to delete this picture from your Inspo Zone?", () => {
+                inspirationData.splice(idx, 1);
+                displayToastNotification("Picture removed.", "🗑️");
+                renderAll();
+            });
+        }
+
+        function clearAllPhotos() {
+            showAppConfirm("Wipe out all images from your gallery?", () => {
+                inspirationData = inspirationData.filter(item => item.type !== 'photo');
+                displayToastNotification("Gallery cleared.", "🗑️");
+                renderAll();
+            });
+        }
+
+        function handleChallengeCompleted(idx, checked) {
+            inspirationData[idx].checked = checked;
+            if (checked) {
+                playAppBeepSound('success');
+                triggerConfetti();
+                displayToastNotification("Congratulations on completing your goal!", "🎉");
+            }
+            renderAll();
+        }
+
+        // ICS Calendar Export Generator
+        function exportEventToICS(e) {
+            try {
+                const dateClean = e.date.replace(/-/g, '');
+                const icsContent = [
+                    'BEGIN:VCALENDAR',
+                    'VERSION:2.0',
+                    'PRODID:-//Readiculous Pocket Library//Calendar Export//EN',
+                    'BEGIN:VEVENT',
+                    `UID:${Date.now()}@readiculous.app`,
+                    `DTSTAMP:${dateClean}T090000Z`,
+                    `DTSTART:${dateClean}T090000Z`,
+                    `DTEND:${dateClean}T100000Z`,
+                    `SUMMARY:Readiculous Event: ${e.title}`,
+                    `LOCATION:${e.loc || 'My Secret Reading Corner'}`,
+                    'DESCRIPTION:Friendly reminder synchronized from your My Readiculous Pocket Library.',
+                    'END:VEVENT',
+                    'END:VCALENDAR'
+                ].join('\r\n');
+
+                const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `${e.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}.ics`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                displayToastNotification("Calendar event (.ics) exported!", "📅");
+            } catch(err) { console.error("Export failure", err); }
+        }
+
+        // Navigation Controllers
+        function switchView(target) {
+            view = target;
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`${target}Section`).classList.add('active');
+            
+            document.getElementById('statsPanel').style.display = target === 'library' ? 'grid' : 'none';
+            document.getElementById('challengeWidget').style.display = target === 'library' ? 'block' : 'none';
+            document.getElementById('searchContainer').style.display = (target === 'library' || target === 'wishlist') ? 'flex' : 'none';
+            
+            updateFiltersUI();
+
+            let headerText = 'My Library';
+            if(target === 'wishlist') headerText = 'My Wishlist';
+            if(target === 'inspiration') headerText = 'My Inspo Zone';
+            if(target === 'agenda') headerText = 'My Reading Hub';
+            document.getElementById('viewTitle').innerText = headerText;
+            
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            if(target === 'library') document.getElementById('navLib').classList.add('active');
+            if(target === 'wishlist') document.getElementById('navWish').classList.add('active');
+            if(target === 'inspiration') document.getElementById('navInsp').classList.add('active');
+            if(target === 'agenda') document.getElementById('navAgenda').classList.add('active');
+            
+            renderAll();
+        }
+
+        function updateFiltersUI() {
+            const filterBar = document.getElementById('contentFilters');
+            if (view === 'library') {
+                filterBar.style.display = 'flex';
+                filterBar.innerHTML = `
+                    <button class="filter-btn ${libraryFilter==='all'?'active':''}" onclick="setLibraryFilter('all')">All</button>
+                    <button class="filter-btn ${libraryFilter==='reading'?'active':''}" onclick="setLibraryFilter('reading')">Reading</button>
+                    <button class="filter-btn ${libraryFilter==='to-read'?'active':''}" onclick="setLibraryFilter('to-read')">To Read</button>
+                    <button class="filter-btn ${libraryFilter==='read'?'active':''}" onclick="setLibraryFilter('read')">Read</button>
+                `;
+            } else if (view === 'agenda') {
+                filterBar.style.display = 'flex';
+                let subTabs = `
+                    <button class="filter-btn ${agendaSubView==='events'?'active':''}" onclick="setAgendaSubView('events')">My Events</button>
+                    <button class="filter-btn ${agendaSubView==='feed'?'active':''}" onclick="setAgendaSubView('feed')">Hub Feed 🗞️</button>
+                `;
+                if(agendaSubView === 'feed') {
+                    subTabs += `
+                        <span style="color:#233d30; font-size:12px; margin-left:4px; margin-right:4px;">|</span>
+                        <button class="filter-btn ${newsInterestFilter==='all'?'active':''}" onclick="setNewsInterest('all')">All</button>
+                        <button class="filter-btn ${newsInterestFilter==='blog'?'active':''}" onclick="setNewsInterest('blog')">Read.Blog</button>
+                        <button class="filter-btn ${newsInterestFilter==='saved'?'active':''}" onclick="setNewsInterest('saved')">🔖 Saved</button>
+                    `;
+                }
+                filterBar.innerHTML = subTabs;
+            } else {
+                filterBar.style.display = 'none';
+            }
+        }
+
+        // Modal Operations Setup
         function openModal(type, editIdx = null) {
             document.getElementById('ctxModal').style.display = 'flex';
             document.querySelectorAll('.passport-form').forEach(f => f.style.display = 'none');
@@ -1288,42 +1299,24 @@
                 }
             }
 
-            if(type === 'share') {
-                document.getElementById('f-share').style.display = 'flex';
-            }
-
             if(type === 'inspiration') {
                 document.getElementById('f-inspiration').style.display = 'flex';
-                const dateRow = document.getElementById('challengeDatesRow');
+                toggleInspirationFormFields('quote');
+                document.getElementById('photoSourceMethod').value = 'upload';
+                togglePhotoUploadInput('upload');
+                
                 if(editIdx !== null) {
                     let insp = inspirationData[editIdx];
                     document.getElementById('editInspIdx').value = editIdx;
                     document.getElementById('inspType').value = insp.type;
+                    document.getElementById('inspContent').value = insp.content;
                     document.getElementById('inspTypeRow').style.display = 'none';
                     document.getElementById('inspModalTitle').innerText = "Edit Snippet";
-                    
                     toggleInspirationFormFields(insp.type);
-                    
-                    if (insp.type === 'challenge') {
-                        document.getElementById('challengeStartDate').value = insp.startDate || '';
-                        document.getElementById('challengeEndDate').value = insp.targetDate || '';
-                        document.getElementById('inspContent').value = insp.content;
-                    } else if (insp.type === 'photo') {
-                        setPhotoSource('url');
-                        document.getElementById('inspPhotoUrl').value = insp.content;
-                    } else {
-                        document.getElementById('inspContent').value = insp.content;
-                    }
                 } else {
-                    document.getElementById('editInspIdx').value = ""; 
-                    document.getElementById('inspContent').value = "";
-                    document.getElementById('inspPhotoUrl').value = "";
-                    document.getElementById('inspFile').value = "";
-                    document.getElementById('challengeStartDate').value = "";
-                    document.getElementById('challengeEndDate').value = "";
+                    document.getElementById('editInspIdx').value = ""; document.getElementById('inspContent').value = "";
+                    document.getElementById('inspType').value = "quote";
                     document.getElementById('inspTypeRow').style.display = 'flex';
-                    document.getElementById('inspType').value = 'quote';
-                    toggleInspirationFormFields('quote');
                     document.getElementById('inspModalTitle').innerText = "Add New Snippet";
                 }
             }
@@ -1355,7 +1348,7 @@
                     document.getElementById('mapSpotType').value = m.type;
                     document.getElementById('mapLat').value = m.x;
                     document.getElementById('mapLng').value = m.y;
-                    document.getElementById('mapModalTitle').innerText = "Edit Secret Location";
+                    document.getElementById('mapModalTitle').innerText = "Edit Book Spot";
                 } else {
                     document.getElementById('editMapIdx').value = ""; document.getElementById('mapSpotName').value = "";
                     document.getElementById('mapSpotAddress').value = ""; document.getElementById('mapSpotType').value = "custom";
@@ -1373,21 +1366,17 @@
             document.getElementById('libDupNotice').style.display = dup ? 'block' : 'none';
         }
 
+        // Saving Data Entities
         function saveLibrary() {
             const idx = document.getElementById('editLibIdx').value;
-            const title = document.getElementById('libTitle').value;
-            const author = document.getElementById('libAuthor').value;
+            const title = document.getElementById('libTitle').value.trim();
+            const author = document.getElementById('libAuthor').value.trim();
             const status = document.getElementById('libStatus').value;
-            if(!title || !author) {
-                showAppAlert("Required fields missing.");
-                return;
-            }
+            if(!title || !author) return showAppAlert("Required fields missing.");
 
             let triggerConfettiEvent = false;
-            if(status === 'read') {
-                if(idx === "" || libraryData[idx].status !== 'read') {
-                    triggerConfettiEvent = true;
-                }
+            if(status === 'read' && (idx === "" || libraryData[idx].status !== 'read')) {
+                triggerConfettiEvent = true;
             }
 
             let item = {
@@ -1415,16 +1404,14 @@
             renderAll();
 
             if(triggerConfettiEvent) {
-                setTimeout(() => {
-                    triggerConfetti();
-                }, 300);
+                setTimeout(() => { triggerConfetti(); playAppBeepSound('success'); }, 300);
             }
         }
 
         function saveWishlist() {
             const idx = document.getElementById('editWishIdx').value;
-            const title = document.getElementById('wishTitle').value;
-            const author = document.getElementById('wishAuthor').value;
+            const title = document.getElementById('wishTitle').value.trim();
+            const author = document.getElementById('wishAuthor').value.trim();
             if(!title || !author) return showAppAlert("Required fields missing.");
 
             let item = {
@@ -1443,208 +1430,57 @@
             closeModal(); renderAll();
         }
 
-        function toggleWish(idx, event) {
-            if (wishlistData[idx].migrating) return;
-            wishlistData[idx].migrating = true;
-
-            const checkboxElement = event.currentTarget;
-            const container = document.querySelector('.smartphone-container');
-            const cRect = container.getBoundingClientRect();
-            const startRect = checkboxElement.getBoundingClientRect();
-
-            const flyDiv = document.createElement('div');
-            flyDiv.className = 'flying-book';
-            flyDiv.innerText = '📖';
-            flyDiv.style.left = (startRect.left - cRect.left) + 'px';
-            flyDiv.style.top = (startRect.top - cRect.top) + 'px';
-            container.appendChild(flyDiv);
-
-            const destElement = document.getElementById('navLib');
-            const destRect = destElement.getBoundingClientRect();
-            const destX = destRect.left - cRect.left + (destRect.width / 2) - 16;
-            const destY = destRect.top - cRect.top + (destRect.height / 2) - 16;
-
-            flyDiv.offsetHeight;
-            flyDiv.style.transform = 'scale(2) rotate(180deg)';
-            
-            setTimeout(() => {
-                flyDiv.style.left = destX + 'px';
-                flyDiv.style.top = destY + 'px';
-                flyDiv.style.transform = 'scale(0.3) rotate(720deg)';
-                flyDiv.style.opacity = '0.3';
-            }, 150);
-
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
-                oscillator.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.6); 
-                gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.6);
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + 0.6);
-            } catch(e) {}
-
-            setTimeout(() => {
-                flyDiv.remove();
-                let item = wishlistData[idx];
-
-                libraryData.push({
-                    title: item.title,
-                    author: item.author,
-                    isbn: item.isbn || '',
-                    cover: `https://placehold.co/150x220/122019/caa35b?text=${encodeURIComponent(item.title)}`,
-                    format: 'Physical',
-                    status: 'read',
-                    rating: 5,
-                    loc: 'Bedside Table',
-                    notes: 'Acquired and read from my Wishlist!',
-                    favorite: false,
-                    startDate: new Date().toISOString().split('T')[0],
-                    endDate: new Date().toISOString().split('T')[0],
-                    dateAdded: Date.now()
-                });
-
-                wishlistData.splice(idx, 1);
-                triggerConfetti();
-                showAppAlert(`🎉 "${item.title}" flew straight into your Library!`);
-                renderAll();
-            }, 950);
-        }
-
-        function openShareModal(idx) {
-            let book = wishlistData[idx];
-            let text = `Hey! Here is a book from my wishlist: "${book.title}" by ${book.author}.${book.isbn ? ' ISBN: ' + book.isbn : ''}${book.where ? ' Where to find: ' + book.where : ''}. No pressure 😉`;
-            
-            document.getElementById('shareText').value = text;
-            document.getElementById('shareEmailBtn').href = `mailto:?subject=${encodeURIComponent("Book wishlist suggestion")}&body=${encodeURIComponent(text)}`;
-            document.getElementById('shareWhatsappBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-            
-            openModal('share');
-        }
-
-        function copyShareText() {
-            let textarea = document.getElementById('shareText');
-            textarea.select();
-            document.execCommand('copy');
-            showAppAlert("📋 Message copied to clipboard! Ready to paste.");
-        }
-
-        function toggleChallengeComplete(idx, event) {
-            event.stopPropagation();
-            const item = inspirationData[idx];
-            item.completed = !item.completed;
-            
-            if (item.completed) {
-                triggerConfetti();
-
-                try {
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const oscillator = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    oscillator.type = 'triangle';
-                    
-                    const now = audioCtx.currentTime;
-                    oscillator.frequency.setValueAtTime(523.25, now);
-                    oscillator.frequency.setValueAtTime(659.25, now + 0.12);
-                    oscillator.frequency.setValueAtTime(783.99, now + 0.24);
-                    oscillator.frequency.setValueAtTime(1046.50, now + 0.36);
-                    
-                    gainNode.gain.setValueAtTime(0.12, now);
-                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
-                    
-                    oscillator.start();
-                    oscillator.stop(now + 0.8);
-                } catch(e) { console.log(e); }
-
-                showElegantCongratsToast(item.content);
-            }
-            
-            renderAll();
-        }
-
-        function showElegantCongratsToast(challengeName) {
-            const toast = document.getElementById('congratsToast');
-            const message = document.getElementById('congratsToastMessage');
-            message.innerHTML = `You successfully completed the <strong>"${challengeName}"</strong> challenge! Brilliant reading! 🏆📖`;
-            
-            toast.style.display = 'block';
-            toast.offsetHeight; 
-            toast.style.transform = 'translateY(0)';
-            toast.style.opacity = '1';
-            
-            setTimeout(() => {
-                toast.style.transform = 'translateY(-20px)';
-                toast.style.opacity = '0';
-                setTimeout(() => {
-                    toast.style.display = 'none';
-                }, 400);
-            }, 4500);
-        }
-
+        // Native Device FileReader conversion for uploads
         function saveInspiration() {
             const idx = document.getElementById('editInspIdx').value;
             const type = document.getElementById('inspType').value;
             
-            let content = "";
-            
-            if (type === 'photo') {
-                if (currentPhotoSource === 'url') {
-                    content = document.getElementById('inspPhotoUrl').value.trim();
-                    if (!content) return showAppAlert("Please enter a valid image URL.");
-                    proceedSave(content);
+            if(type === 'photo') {
+                const method = document.getElementById('photoSourceMethod').value;
+                if(method === 'url') {
+                    const content = document.getElementById('photoUrlVal').value.trim();
+                    if(!content) return showAppAlert("Please enter a valid image URL.");
+                    finishSaveInspiration(type, content, idx);
                 } else {
-                    const fileInput = document.getElementById('inspFile');
-                    if (fileInput.files && fileInput.files[0]) {
+                    const fileInput = document.getElementById('photoLocalFile');
+                    if(fileInput.files && fileInput.files[0]) {
                         const reader = new FileReader();
                         reader.onload = function(e) {
-                            proceedSave(e.target.result); 
+                            finishSaveInspiration(type, e.target.result, idx);
                         };
                         reader.readAsDataURL(fileInput.files[0]);
                     } else {
-                        if (idx !== "") {
-                            proceedSave(inspirationData[idx].content);
-                        } else {
-                            return showAppAlert("Please choose an image file from your device.");
-                        }
+                        showAppAlert("Please select an image file to upload.");
                     }
                 }
             } else {
-                content = document.getElementById('inspContent').value.trim();
-                if (!content) return showAppAlert("Input content missing.");
-                proceedSave(content);
+                const content = document.getElementById('inspContent').value.trim();
+                if(!content) return showAppAlert("Input content missing.");
+                finishSaveInspiration(type, content, idx);
+            }
+        }
+
+        function finishSaveInspiration(type, content, idx) {
+            let item = { type, content };
+            if (type === 'challenge') {
+                item.startDate = document.getElementById('challengeStartDate').value;
+                item.endDate = document.getElementById('challengeEndDate').value;
+                item.checked = false;
             }
 
-            function proceedSave(resolvedContent) {
-                let itemData = { 
-                    type, 
-                    content: resolvedContent, 
-                    completed: idx !== "" ? inspirationData[idx].completed : false,
-                    startDate: type === 'challenge' ? document.getElementById('challengeStartDate').value : undefined,
-                    targetDate: type === 'challenge' ? document.getElementById('challengeEndDate').value : undefined
-                };
-
-                if(idx !== "") {
-                    inspirationData[idx] = itemData;
-                } else {
-                    inspirationData.push(itemData);
-                }
-                closeModal(); 
-                renderAll();
+            if(idx !== "") {
+                inspirationData[idx] = item;
+            } else {
+                inspirationData.push(item);
             }
+            closeModal(); renderAll();
         }
 
         function saveAgenda() {
             const idx = document.getElementById('editAgeIdx').value;
-            const title = document.getElementById('ageTitle').value;
+            const title = document.getElementById('ageTitle').value.trim();
             const date = document.getElementById('ageDate').value;
-            const loc = document.getElementById('ageLoc').value;
+            const loc = document.getElementById('ageLoc').value.trim();
             const alertVal = document.getElementById('ageAlert').value;
             if(!title || !date) return showAppAlert("Required fields missing.");
 
@@ -1658,87 +1494,7 @@
             closeModal(); renderAll();
         }
 
-        function switchView(target) {
-            view = target;
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.getElementById(`${target}Section`).classList.add('active');
-            
-            document.getElementById('statsPanel').style.display = target === 'library' ? 'grid' : 'none';
-            document.getElementById('challengeWidget').style.display = target === 'library' ? 'block' : 'none';
-            document.getElementById('searchContainer').style.display = (target === 'library' || target === 'wishlist') ? 'flex' : 'none';
-            
-            updateFiltersUI();
-
-            let headerText = "My Library";
-            if(target === 'wishlist') headerText = "My Wishlist";
-            if(target === 'inspiration') headerText = "My Inspo Zone";
-            if(target === 'agenda') headerText = "My Reading Hub";
-            document.getElementById('viewTitle').innerText = headerText;
-            
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            if(target === 'library') document.getElementById('navLib').classList.add('active');
-            if(target === 'wishlist') document.getElementById('navWish').classList.add('active');
-            if(target === 'inspiration') document.getElementById('navInsp').classList.add('active');
-            if(target === 'agenda') document.getElementById('navAgenda').classList.add('active');
-            
-            renderAll();
-        }
-
-        function updateFiltersUI() {
-            const filterBar = document.getElementById('contentFilters');
-            if (view === 'library') {
-                filterBar.style.display = 'flex';
-                filterBar.innerHTML = `
-                    <button class="filter-btn ${libraryFilter==='all'?'active':''}" onclick="setLibraryFilter('all')">All</button>
-                    <button class="filter-btn ${libraryFilter==='reading'?'active':''}" onclick="setLibraryFilter('reading')">Reading</button>
-                    <button class="filter-btn ${libraryFilter==='to-read'?'active':''}" onclick="setLibraryFilter('to-read')">To Read</button>
-                    <button class="filter-btn ${libraryFilter==='read'?'active':''}" onclick="setLibraryFilter('read')">Read</button>
-                `;
-            } else if (view === 'agenda') {
-                filterBar.style.display = 'flex';
-                let subTabs = `
-                    <button class="filter-btn ${agendaSubView==='events'?'active':''}" onclick="setAgendaSubView('events')">My Events</button>
-                    <button class="filter-btn ${agendaSubView==='feed'?'active':''}" onclick="setAgendaSubView('feed')">Hub Feed 🗞️</button>
-                `;
-                if(agendaSubView === 'feed') {
-                    subTabs += `
-                        <span style="color:#233d30; font-size:12px; margin-left:4px; margin-right:4px;">|</span>
-                        <button class="filter-btn ${newsInterestFilter==='all'?'active':''}" onclick="setNewsInterest('all')">All</button>
-                        <button class="filter-btn ${newsInterestFilter==='blog'?'active':''}" onclick="setNewsInterest('blog')">Read.Blog</button>
-                        <button class="filter-btn ${newsInterestFilter==='saved'?'active':''}" onclick="setNewsInterest('saved')">Saved</button>
-                    `;
-                }
-                filterBar.innerHTML = subTabs;
-            } else {
-                filterBar.style.display = 'none';
-            }
-        }
-
-        function dismissNews(id) {
-            dismissedNewsIds.push(id);
-            renderAll();
-        }
-
-        function toggleNewsSave(id) {
-            let sIdx = savedNewsIds.indexOf(id);
-            if(sIdx > -1) {
-                savedNewsIds.splice(sIdx, 1);
-                showAppAlert("🔖 Article removed from your Saved feed.");
-            } else {
-                savedNewsIds.push(id);
-                showAppAlert("🔖 Article successfully saved for later!");
-            }
-            renderAll();
-        }
-
-        function toggleSourcePreference() {
-            enabledSources.nyt = document.getElementById('prefNYT').checked;
-            enabledSources.guardian = document.getElementById('prefGuardian').checked;
-            enabledSources.local = document.getElementById('prefLocal').checked;
-            enabledSources.goods = document.getElementById('prefGoodreads').checked;
-            renderAll();
-        }
-
+        // Delete handlers
         function deleteItem(type, idx) {
             showAppConfirm("Are you sure you want to delete this item?", () => {
                 if(type === 'library') libraryData.splice(idx, 1);
@@ -1760,11 +1516,57 @@
             }, 400);
         }
 
+        // Migrate Wishlist book instantly to Main Library portfolio
+        function migrateWishlistToLibrary(idx, elementId) {
+            executeFlyingBookAnimation(elementId, () => {
+                const wish = wishlistData[idx];
+                
+                // Construct a default Library record from the Wishlist data
+                const newLibItem = {
+                    title: wish.title,
+                    author: wish.author,
+                    isbn: wish.isbn || '',
+                    cover: `https://placehold.co/150x220/122019/caa35b?text=${encodeURIComponent(wish.title)}`,
+                    format: "Physical",
+                    status: "read",
+                    rating: 5,
+                    loc: wish.where || "Home Library",
+                    notes: "Migrated from Wishlist!",
+                    favorite: false,
+                    startDate: new Date().toISOString().split('T')[0],
+                    endDate: new Date().toISOString().split('T')[0],
+                    dateAdded: Date.now()
+                };
+
+                libraryData.push(newLibItem);
+                wishlistData.splice(idx, 1);
+                renderAll();
+                displayToastNotification("Book moved to Library!", "📖");
+            });
+        }
+
+        // Regional literary feeds simulation
+        function detectLocalSourceTitle() {
+            try {
+                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                if(tz.includes("Paris") || tz.includes("Europe/Paris")) return "Le Monde Livres";
+                if(tz.includes("Madrid") || tz.includes("Europe/Madrid")) return "El País Cultura";
+                if(tz.includes("Lisbon") || tz.includes("Europe/Lisbon") || tz.includes("Atlantic/Madeira")) return "Expresso Livros";
+                return "BBC Culture Books";
+            } catch(e) { return "Expresso Livros"; }
+        }
+
+        // Main Rendering Pipeline
         function renderAll() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const sortBy = document.getElementById('sortSelect').value;
 
-            // 1. Library Section
+            // Update Dynamic Regional news titles in memory
+            newsData.forEach(item => {
+                if(item.type === 'local') item.source = detectLocalSourceTitle();
+            });
+
+            // 1. Library rendering and calculations
             const libGrid = document.getElementById('libraryGrid');
             libGrid.innerHTML = '';
             
@@ -1773,30 +1575,23 @@
                 (b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query))
             );
 
-            // Adaptive Sorting Algorithm
+            // Sorting algorithm
             filteredLib.sort((a, b) => {
-                if (sortBy === 'title-asc') {
-                    return a.title.localeCompare(b.title);
-                } else if (sortBy === 'author-asc') {
-                    return a.author.localeCompare(b.author);
-                } else if (sortBy === 'favorites') {
-                    return (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0);
-                } else if (sortBy === 'newest') {
-                    return (b.dateAdded || 0) - (a.dateAdded || 0);
-                } else if (sortBy === 'oldest') {
-                    return (a.dateAdded || 0) - (b.dateAdded || 0);
-                }
+                if (sortBy === 'title-asc') return a.title.localeCompare(b.title);
+                if (sortBy === 'author-asc') return a.author.localeCompare(b.author);
+                if (sortBy === 'favorites') return (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0);
+                if (sortBy === 'newest') return (b.dateAdded || 0) - (a.dateAdded || 0);
+                if (sortBy === 'oldest') return (a.dateAdded || 0) - (b.dateAdded || 0);
                 return 0;
             });
 
             filteredLib.forEach((b) => {
                 let actualIdx = libraryData.indexOf(b);
-                
                 let datesHTML = '';
                 if (b.status === 'read' && (b.startDate || b.endDate)) {
                     datesHTML = `<div style="font-size:9px; color:var(--text-muted); margin-top:4px;">📅 Read from: ${b.startDate || '?'} to ${b.endDate || '?'}</div>`;
                 } else if (b.status === 'reading' && b.startDate) {
-                    datesHTML = `<div style="font-size:9px; color:var(--text-muted); margin-top:4px;">📖 Started on: ${b.startDate}</div>`;
+                    datesHTML = `<div style="font-size:9px; color:var(--text-muted); margin-top:4px;">📖 Started: ${b.startDate}</div>`;
                 }
 
                 libGrid.innerHTML += `
@@ -1811,7 +1606,7 @@
                             <div style="display:flex; gap:4px; margin-top:2px; flex-wrap:wrap;">
                                 <span class="tag">${b.format}</span>
                                 ${b.rating ? `<span class="tag" style="background:#223c2e;">⭐ ${b.rating}</span>` : ''}
-                                <span class="tag" style="background:#1c3227; text-transform:uppercase;">${b.status}</span>
+                                <span class="tag" style="background:#1c3227;">${b.status}</span>
                             </div>
                             ${datesHTML}
                         </div>
@@ -1822,127 +1617,88 @@
                     </div>`;
             });
 
+            // 2. Stats & dynamic breakdown calculations
+            const totalBooks = libraryData.length;
             const totalRead = libraryData.filter(b => b.status === 'read').length;
             const totalFavs = libraryData.filter(b => b.favorite).length;
 
-            // Calculate dynamic formats percentage breakdown
-            const totalBooks = libraryData.length;
-            let physPct = 0, ebPct = 0, auPct = 0;
-            if (totalBooks > 0) {
-                const physicalCount = libraryData.filter(b => b.format === 'Physical').length;
-                const ebookCount = libraryData.filter(b => b.format === 'Ebook').length;
-                const audioCount = libraryData.filter(b => b.format === 'Audiobook').length;
-                
-                physPct = Math.round((physicalCount / totalBooks) * 100);
-                ebPct = Math.round((ebookCount / totalBooks) * 100);
-                auPct = Math.round((audioCount / totalBooks) * 100);
-            }
+            const physicalCount = libraryData.filter(b => b.format === 'Physical').length;
+            const digitalCount = libraryData.filter(b => b.format === 'Ebook' || b.format === 'Audiobook').length;
+            const breakdownPercent = totalBooks > 0 ? Math.round((physicalCount / totalBooks) * 100) : 0;
 
             document.getElementById('stat-read').innerText = totalRead;
             document.getElementById('stat-fav').innerText = totalFavs;
-            document.getElementById('stat-formats').innerText = `${physPct}/${ebPct}/${auPct}%`;
-            
-            document.getElementById('lbl-read').innerText = "Read";
-            document.getElementById('lbl-fav').innerText = "Favorites";
-            document.getElementById('lbl-formats').innerText = "Phys / Eb / Au";
+            document.getElementById('stat-breakdown').innerText = `${breakdownPercent}% Physical`;
 
-            const challenges = inspirationData.filter(i => i.type === 'challenge');
-            const totalChallenges = challenges.length;
-            const completedChallenges = challenges.filter(c => c.completed).length;
+            // Active Challenge Progress bar sync
+            const activeChallenge = inspirationData.find(item => item.type === 'challenge' && !item.checked);
+            const challengeWidget = document.getElementById('challengeWidget');
 
-            let challengePercentage = 0;
-            let encouragement = "";
-            let challengeLabelText = "Challenge Progress";
-
-            if (totalChallenges === 0) {
-                encouragement = "Add a challenge! 🎯";
-                challengePercentage = 0;
-                document.getElementById('challenge-count').innerText = "0 / 0";
-            } else {
-                challengePercentage = (completedChallenges / totalChallenges) * 100;
-                document.getElementById('challenge-count').innerText = `${completedChallenges} / ${totalChallenges}`;
+            if (activeChallenge) {
+                challengeWidget.style.display = 'block';
+                document.getElementById('challenge-header-title').innerText = activeChallenge.content;
+                document.getElementById('challenge-header-dates').innerText = `Target: ${activeChallenge.startDate || 'N/A'} - ${activeChallenge.endDate || 'N/A'}`;
                 
-                const activeChallenge = challenges.find(c => !c.completed) || challenges[challenges.length - 1];
-                if (activeChallenge) {
-                    challengeLabelText = `Active: ${activeChallenge.content}`;
-                    if (activeChallenge.startDate || activeChallenge.targetDate) {
-                        challengeLabelText += ` (${activeChallenge.startDate || '?'} to ${activeChallenge.targetDate || '?'})`;
-                    }
-                }
+                // Track actual progress
+                const completionPercentage = Math.min(Math.round((totalRead / 12) * 100), 100);
+                document.getElementById('challenge-count').innerText = `${completionPercentage}% Completed`;
+                document.getElementById('challenge-bar').style.width = `${completionPercentage}%`;
 
-                if (completedChallenges === 0) {
-                    encouragement = "Let's start! 📖";
-                } else if (challengePercentage < 50) {
-                    encouragement = "Getting there! 💫";
-                } else if (challengePercentage < 100) {
-                    encouragement = "Good job! 🌟";
-                } else {
-                    encouragement = "Congratulations! 🎉";
-                }
+                // Motivation messages
+                let motivation = "Let's start reading! 📖";
+                if(completionPercentage > 0 && completionPercentage < 50) motivation = "Getting there! Keep it up! 💫";
+                if(completionPercentage >= 50 && completionPercentage < 100) motivation = "Good job! More than halfway there! 🌟";
+                if(completionPercentage === 100) motivation = "Congratulations! Challenge achieved! 🎉";
+                document.getElementById('challengeMotivation').innerText = motivation;
+            } else {
+                challengeWidget.style.display = 'none';
             }
 
-            document.getElementById('lbl-challenge').innerText = challengeLabelText;
-            document.getElementById('challenge-encouragement').innerText = encouragement;
-            document.getElementById('challenge-bar').style.width = `${challengePercentage}%`;
-
-            const addLibBtn = document.querySelector('#librarySection .section-action-btn');
-            if (addLibBtn) addLibBtn.innerText = "✦ Add Book Entry";
-            const addWishBtn = document.querySelector('#wishlistSection .section-action-btn');
-            if (addWishBtn) addWishBtn.innerText = "✦ Add to Wishlist";
-            const addInspBtn = document.querySelector('#inspirationSection .section-action-btn');
-            if (addInspBtn) addInspBtn.innerText = "✦ Add New Snippet";
-            
-            const toggleMapBtn = document.getElementById('toggleMapBtn');
-            if (toggleMapBtn) {
-                toggleMapBtn.innerText = isMapOpen ? "📍 Close Book Locations Map" : "📍 Open Book Locations Map";
-            }
-            const addEventBtn = document.getElementById('addEventBtn');
-            if (addEventBtn) addEventBtn.innerText = "✦ Add Calendar Event";
-
-            // 2. Wishlist Section
+            // 3. Wishlist Section rendering with sorting
             const wishGrid = document.getElementById('wishlistGrid');
             wishGrid.innerHTML = '';
-            
-            let filteredWish = wishlistData.filter(w => w.title.toLowerCase().includes(query));
 
+            let filteredWish = wishlistData.filter(w => 
+                w.title.toLowerCase().includes(query) || w.author.toLowerCase().includes(query)
+            );
+
+            // Wishlist sorting alignment
             filteredWish.sort((a, b) => {
-                if (sortBy === 'title-asc') {
-                    return a.title.localeCompare(b.title);
-                } else if (sortBy === 'author-asc') {
-                    return a.author.localeCompare(b.author);
-                } else if (sortBy === 'newest') {
-                    return (b.dateAdded || 0) - (a.dateAdded || 0);
-                } else if (sortBy === 'oldest') {
-                    return (a.dateAdded || 0) - (b.dateAdded || 0);
-                }
+                if (sortBy === 'title-asc') return a.title.localeCompare(b.title);
+                if (sortBy === 'author-asc') return a.author.localeCompare(b.author);
+                if (sortBy === 'newest') return (b.dateAdded || 0) - (a.dateAdded || 0);
+                if (sortBy === 'oldest') return (a.dateAdded || 0) - (b.dateAdded || 0);
                 return 0;
             });
 
             filteredWish.forEach((w) => {
                 let actualIdx = wishlistData.indexOf(w);
+                let elementId = `wish-card-${actualIdx}`;
                 wishGrid.innerHTML += `
-                    <div class="book-card" style="transition: all 0.3s ease;">
-                        <div class="posh-checkbox ${w.checked ? 'checked' : ''}" onclick="toggleWish(${actualIdx}, event)">✓</div>
-                        <div class="book-details" style="padding-left:10px; padding-right: 55px;">
-                            <div class="book-title" style="${w.checked ? 'text-decoration:line-through; opacity:0.4;':''}">${w.title}</div>
+                    <div class="book-card" id="${elementId}">
+                        <div class="posh-checkbox" onclick="migrateWishlistToLibrary(${actualIdx}, '${elementId}')">✓</div>
+                        <div class="book-details" style="padding-left:10px;">
+                            <div class="book-title">${w.title}</div>
                             <div class="book-author">${w.author}</div>
                             ${w.where ? `<span class="tag" style="margin-top:2px;">📍 ${w.where}</span>` : ''}
                         </div>
-                        <div class="actions-wrapper">
-                            <button class="action-icon-btn" onclick="openShareModal(${actualIdx})" title="Share Book">📤</button>
+                        <div class="actions-wrapper" style="right:15px; flex-direction:row;">
+                            <button class="action-icon-btn" onclick="openShareSheet(${actualIdx})">📤</button>
                             <button class="action-icon-btn" onclick="openModal('wishlist', ${actualIdx})">✏️</button>
                             <button class="action-icon-btn" onclick="deleteItem('wishlist', ${actualIdx})">🗑️</button>
                         </div>
                     </div>`;
             });
 
-            // 3. Inspiration Zone Lists
-            document.getElementById('quotesZone').innerHTML = ''; document.getElementById('photoZone').innerHTML = '';
-            document.getElementById('challengeZone').innerHTML = ''; document.getElementById('listsZone').innerHTML = '';
+            // 4. Inspiration Zone elements
+            document.getElementById('quotesZone').innerHTML = ''; 
+            document.getElementById('photoZone').innerHTML = '';
+            document.getElementById('challengeZone').innerHTML = ''; 
+            document.getElementById('listsZone').innerHTML = '';
 
             inspirationData.forEach((item, actualIdx) => {
                 let actionHTML = `
-                    <div class="actions-wrapper" style="flex-direction:row; right:15px; top:15px;">
+                    <div class="actions-wrapper" style="flex-direction:row; right:15px; top:15px; z-index:10;">
                         <button class="action-icon-btn" onclick="openModal('inspiration', ${actualIdx})">✏️</button>
                         <button class="action-icon-btn" onclick="deleteItem('inspiration', ${actualIdx})">🗑️</button>
                     </div>`;
@@ -1951,26 +1707,24 @@
                     document.getElementById('quotesZone').innerHTML += `<div class="book-card" style="padding-right:75px;"><blockquote style="font-style:italic; font-size:12px;">"${item.content}"</blockquote>${actionHTML}</div>`;
                 } else if(item.type === 'photo') {
                     document.getElementById('photoZone').innerHTML += `
-                        <div class="mood-photo" style="position: relative;">
+                        <div class="mood-photo">
                             <img src="${item.content}">
-                            <div class="photo-action-pill">
-                                <button class="photo-action-btn" onclick="openModal('inspiration', ${actualIdx})" title="Edit Photo">✏️</button>
-                                <button class="photo-action-btn" onclick="deleteItem('inspiration', ${actualIdx})" title="Delete Photo">🗑️</button>
+                            <div class="photo-actions-pill">
+                                <button class="photo-pill-btn" onclick="openModal('inspiration', ${actualIdx})">✏️</button>
+                                <button class="photo-pill-btn" onclick="deletePhoto(${actualIdx})">🗑️</button>
                             </div>
                         </div>`;
                 } else if(item.type === 'challenge') {
-                    const isCompleted = !!item.completed;
-                    const completedClass = isCompleted ? 'challenge-box-complete' : '';
-                    const datesLabel = (item.startDate || item.targetDate) ? 
-                        `<div style="font-size: 8px; color: var(--text-muted); margin-top: 4px;">📅 ${item.startDate || '?'} to ${item.targetDate || '?'}</div>` : '';
+                    let checkboxState = item.checked ? 'checked' : '';
+                    let customGlowClass = item.checked ? 'challenge-box-complete' : '';
                     document.getElementById('challengeZone').innerHTML += `
-                        <div class="mood-btn ${completedClass}" style="display:flex; flex-direction:column; justify-content:center; padding-right:55px; position:relative;">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <div class="posh-checkbox ${isCompleted ? 'checked' : ''}" onclick="toggleChallengeComplete(${actualIdx}, event)" style="flex-shrink:0;">✓</div>
-                                <div style="display:flex; flex-direction:column; text-align:left;">
-                                    <span style="${isCompleted ? 'text-decoration:line-through; opacity:0.6;' : ''}">🎯 ${item.content}</span>
-                                    ${datesLabel}
-                                </div>
+                        <div class="mood-btn ${customGlowClass}">
+                            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                                <span style="font-weight:bold; font-size:11px;">🎯 ${item.content}</span>
+                                <input type="checkbox" ${checkboxState} onchange="handleChallengeCompleted(${actualIdx}, this.checked)" style="cursor:pointer; accent-color:var(--gold-primary);">
+                            </div>
+                            <div style="font-size:8px; color:var(--text-muted); margin-top:6px;">
+                                Dates: ${item.startDate || 'N/A'} to ${item.endDate || 'N/A'}
                             </div>
                             ${actionHTML}
                         </div>`;
@@ -1979,35 +1733,30 @@
                 }
             });
 
-            // 4. Agenda Hub Events
+            // 5. Reading Hub rendering
             const agendaGrid = document.getElementById('agendaGrid');
             agendaGrid.innerHTML = '';
 
             if (agendaSubView === 'events') {
                 agendaData.forEach((e, actualIdx) => {
-                    const isUrgent = e.alert === 'Urgent';
-                    const isApproaching = checkApproachingStatus(e.date);
+                    const todayDate = new Date();
+                    const eventDate = new Date(e.date);
+                    const diffTime = eventDate - todayDate;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                     
-                    let priorityClass = 'normal-reminder';
-                    if (isUrgent) {
-                        priorityClass = isApproaching ? 'urgent-approaching' : 'urgent-reminder';
+                    let urgentPulseClass = '';
+                    if(e.alert === 'Urgent' && diffDays <= 1) {
+                        urgentPulseClass = 'urgent-alert';
                     }
 
                     agendaGrid.innerHTML += `
-                        <div class="agenda-card ${priorityClass}">
-                            <div class="book-details" style="padding-right:45px;">
-                                <div class="book-title" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                                    <span>${e.title}</span>
-                                    <span class="tag" style="background:${isUrgent ? 'var(--accent-red)' : 'var(--gold-primary)'}; color:var(--bg-main); font-weight:bold;">
-                                        ${isUrgent ? '🔥 Urgent' : '📌 Normal'}
-                                    </span>
-                                </div>
-                                <div class="book-author" style="margin-top: 2px;">📅 ${e.date} ${e.loc ? `| 📍 ${e.loc}` : ''}</div>
-                                <button class="export-ics-btn" onclick="exportToNativeCalendar('${e.title}', '${e.date}', '${e.loc}')">
-                                    📅 Add to Phone Calendar
-                                </button>
+                        <div class="agenda-card ${urgentPulseClass}">
+                            <div class="book-details">
+                                <div class="book-title">${e.title} <span class="tag" style="background:${e.alert==='Urgent'?'var(--accent-red)':'#1c3227'}; color:white;">${e.alert}</span></div>
+                                <div class="book-author">📅 ${e.date} ${e.loc ? `| 📍 ${e.loc}` : ''}</div>
                             </div>
-                            <div class="actions-wrapper">
+                            <div class="actions-wrapper" style="right:15px; flex-direction:row; gap:12px;">
+                                <button class="action-icon-btn" onclick="exportEventToICS(agendaData[${actualIdx}])" title="Export to Phone Calendar">📅 Export</button>
                                 <button class="action-icon-btn" onclick="openModal('agenda', ${actualIdx})">✏️</button>
                                 <button class="action-icon-btn" onclick="deleteItem('agenda', ${actualIdx})">🗑️</button>
                             </div>
@@ -2017,35 +1766,23 @@
                 newsData.filter(news => {
                     if (dismissedNewsIds.includes(news.id)) return false;
                     if (newsInterestFilter === 'saved' && !savedNewsIds.includes(news.id)) return false;
-                    
+                    if (newsInterestFilter === 'blog' && news.type !== 'local') return false;
                     if (news.type === 'nyt' && !enabledSources.nyt) return false;
-                    if (news.type === 'guardian' && !enabledSources.guardian) return false;
+                    if (news.type === 'indie' && !enabledSources.indie) return false;
                     if (news.type === 'local' && !enabledSources.local) return false;
-                    if (news.type === 'goodreads' && !enabledSources.goods) return false;
                     return true;
-                }).forEach(news => {
+                }).slice(0, 3).forEach(news => { // Limit to 3 latest elements
                     let isSaved = savedNewsIds.includes(news.id);
                     agendaGrid.innerHTML += `
-                        <div class="news-card" style="position: relative; padding-right: 60px;">
+                        <div class="news-card">
                             <div class="book-details">
-                                <div class="news-source" style="display:flex; align-items:center; gap:4px;">
-                                    <span>${news.source}</span> 
-                                    <div class="flash-dot"></div>
-                                </div>
-                                <a href="${news.link || '#'}" target="_blank" class="book-title" style="font-size:12px; margin-top:2px; display:block; color:var(--text-light); text-decoration:underline;">
-                                    ${news.title}
-                                </a>
-                                <div class="book-author" style="font-size:10px; color:var(--text-muted); margin-top:4px; line-height:1.4;">
-                                    ${news.summary}
-                                </div>
+                                <div class="news-source">${news.source} <div class="flash-dot"></div></div>
+                                <div class="book-title" style="font-size:12px; margin-top:2px;">${news.title}</div>
+                                <div class="book-author" style="font-size:10px; color:var(--text-light); margin-top:4px;">${news.summary}</div>
                             </div>
-                            <div class="actions-wrapper" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px;">
-                                <button class="action-icon-btn" onclick="toggleNewsSave('${news.id}')" title="${isSaved ? 'Unsave Article' : 'Save for Later'}" style="font-size: 14px; background: none; border: none; cursor: pointer; filter: none; opacity: 1;">
-                                    ${isSaved ? '🔖' : '🏷️'}
-                                </button>
-                                <button class="action-icon-btn" onclick="dismissNews('${news.id}')" title="Hide Article" style="font-size: 11px; background: none; border: none; cursor: pointer;">
-                                    ❌
-                                </button>
+                            <div class="actions-wrapper">
+                                <button class="action-icon-btn" onclick="saveNewsItem(${news.id})">${isSaved ? '🔖 Saved' : '🏷️ Save'}</button>
+                                <button class="action-icon-btn" onclick="dismissNewsItem(${news.id})" style="margin-top:4px;">❌ Hide</button>
                             </div>
                         </div>`;
                 });
@@ -2054,10 +1791,7 @@
             if(isMapOpen) renderMapPins();
         }
 
-        window.onload = () => { 
-            autoDetectLocalLiterarySource();
-            renderAll(); 
-        };
+        window.onload = () => { renderAll(); };
     </script>
 </body>
 </html>
